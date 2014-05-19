@@ -16,6 +16,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="pl.edu.agh.sm.whereisthatbus.app.SearchActivity"
+            android:label="@string/title_activity_search" >
+        </activity>
+        <activity
+            android:name="pl.edu.agh.sm.whereisthatbus.app.ReportActivity"
+            android:label="@string/title_activity_report" >
+        </activity>
     </application>
 
 </manifest>

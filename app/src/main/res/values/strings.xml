@@ -2,7 +2,13 @@
 <resources>
 
     <string name="app_name">WhereIsThatBus</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="line_number">Numer linii</string>
+    <string name="bus_stop">Nazwa przystanku</string>
     <string name="action_settings">Settings</string>
+    <string name="search">Wyszukaj połączenie</string>
+    <string name="report">Zatwierdz autobus</string>
+    <string name="title_activity_search">SearchActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_report">ReportActivity</string>
 
 </resources>
