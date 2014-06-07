@@ -28,14 +28,16 @@
         android:layout_height="wrap_content"
         android:ems="8" />
 
-    <EditText
-        android:hint="Podaj kierunek"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+    <AutoCompleteTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/directionName"
+        android:hint="Kierunek" />
 
     <Button
         android:text="Search"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:id="@+id/goSearchButton" />
 
 </LinearLayout>
