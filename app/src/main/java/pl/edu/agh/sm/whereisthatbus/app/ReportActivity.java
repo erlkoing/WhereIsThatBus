@@ -15,7 +15,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -111,10 +113,19 @@ public class ReportActivity extends Activity {
                 testObject.put("bus_stop_id", db.getBusStopId(busStopsNameReport.getText().toString()));
                 testObject.put("line_number", lineNameSpinnerReport.getSelectedItem().toString());
                 testObject.put("line_direction_id", db.getBusStopId(directionSpinnerReport.getSelectedItem().toString()));
-                testObject.saveInBackground();
-                Toast.makeText(getApplicationContext(), "Report Send", Toast.LENGTH_SHORT).show();
+                testObject.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        afterReport();
+                    }
+                });
             }
         });
+    }
+
+    private void afterReport() {
+        Toast.makeText(getApplicationContext(), "Report Send", Toast.LENGTH_SHORT).show();
+        this.finish();
     }
 
     @Override
