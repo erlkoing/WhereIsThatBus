@@ -15,29 +15,30 @@
         android:layout_height="wrap_content" />
 
     <AutoCompleteTextView
-        android:id="@+id/busStopsName"
+        android:id="@+id/busStopsNameSearch"
         android:hint="Podaj nazwę przystanku"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:ems="8" />
 
-    <AutoCompleteTextView
-        android:id="@+id/linesName"
-        android:hint="Podaj number linii"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:ems="8" />
-
-    <AutoCompleteTextView
+    <Spinner
+        android:id="@+id/lineNameSpinnerSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/directionName"
-        android:hint="Kierunek" />
+        android:layout_gravity="center_horizontal"
+        android:spinnerMode="dropdown" />
+
+    <Spinner
+        android:id="@+id/directionSpinnerSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:spinnerMode="dropdown" />
 
     <Button
-        android:text="Search"
+        android:id="@+id/searchButton"
+        android:text="Report"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/goSearchButton" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

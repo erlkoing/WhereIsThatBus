@@ -14,22 +14,29 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <EditText
+    <AutoCompleteTextView
+        android:id="@+id/busStopsNameReport"
         android:hint="Podaj nazwę przystanku"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:ems="8" />
 
-    <EditText
-        android:hint="Podaj numer linii"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+    <Spinner
+        android:id="@+id/lineNameSpinnerReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:spinnerMode="dropdown" />
 
-    <EditText
-        android:hint="Podaj kierunek"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+    <Spinner
+        android:id="@+id/directionSpinnerReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:spinnerMode="dropdown" />
 
     <Button
+        android:id="@+id/reportButton"
         android:text="Report"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
