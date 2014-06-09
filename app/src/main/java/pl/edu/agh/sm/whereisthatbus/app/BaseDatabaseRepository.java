@@ -19,7 +19,7 @@ public class BaseDatabaseRepository extends SQLiteOpenHelper
 {
 	protected Context context;
 	protected SQLiteDatabase database;
-	private final static String DATABASE_NAME = "rozklady-2014-05-20-13-30.db" ;
+	private final static String DATABASE_NAME = "rozklad.sqlite" ;
 	
 	
 	public BaseDatabaseRepository(Context context)
