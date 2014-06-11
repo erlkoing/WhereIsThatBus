@@ -1,7 +1,12 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.text.format.Time;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,9 +15,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.parse.Parse;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.CountCallback;
+import com.parse.ParseQueryAdapter;
+import com.parse.*;
+
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SearchActivity extends Activity {
     AutoCompleteTextView busStopsNameSearch;
@@ -98,8 +113,34 @@ public class SearchActivity extends Activity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
+                query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());
+                query.whereEqualTo("bus_stop_id", db.getBusStopId(busStopsNameSearch.getText().toString()));
+                query.whereEqualTo("line_direction_id", db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
+                query.setLimit(2);
+                query.getFirstInBackground(new GetCallback<ParseObject>() {
+                    public void done(ParseObject object, ParseException e) {
+                        Intent intent = new Intent(SearchActivity.this, DisplayActivity.class);
 
-                Toast.makeText(getApplicationContext(), "Not implemented", Toast.LENGTH_SHORT).show();
+                        if (object == null) {
+                            Log.d("score", "The getFirst request failed.");//nie udało się pobrać lub nie ma danych w bazie
+                        } else {
+                            intent.putExtra("lastSeen", new SimpleDateFormat("HH:mm").format(object.getCreatedAt()));
+                            Log.d("score", "Retrieved the object.");
+                        }
+                        //String newstring = new SimpleDateFormat("HH:mm").format(object.getCreatedAt());
+                        intent.putExtra("lineNumber", lineNameSpinnerSearch.getSelectedItem().toString());
+                        intent.putExtra("busStop", busStopsNameSearch.getText().toString());
+                        intent.putExtra("lineDirection", directionSpinnerSearch.getSelectedItem().toString());
+                        //intent.putExtra("lastSeen", object.getDate("createdAt"));
+                        //startActivity(intent);
+                        Log.i("tak", lineNameSpinnerSearch.getSelectedItem().toString());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+                        builder.setMessage("Autobus lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku "+ busStopsNameSearch.getText().toString()+" był ostatnio widziany o "+new SimpleDateFormat("HH:mm").format(object.getCreatedAt())).setTitle("Informacja");
+                        AlertDialog dialog = builder.create();
+                    }
+                });
+                //Toast.makeText(getApplicationContext(), "Not implemented", Toast.LENGTH_SHORT).show();
             }
         });
     }

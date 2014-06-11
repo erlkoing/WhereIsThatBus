@@ -37,7 +37,7 @@
 
     <Button
         android:id="@+id/searchButton"
-        android:text="Report"
+        android:text="Search"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
 

@@ -5,17 +5,18 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class DisplayActivity extends Activity {
-    String busStop, line, direction;
+    String busStop, lineName, lineDirection;
+    String lastSeen;
+    DataBaseRepository db;
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+    String currentTime = sdf.format(new Date());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,10 +26,17 @@ public class DisplayActivity extends Activity {
         Bundle extras = getIntent().getExtras();
         if (extras != null){
             busStop = extras.getString("busStop");
-            line = extras.getString("line");
-            direction = extras.getString("direction");
+            lineName = extras.getString("lineNumber");
+            lineDirection = extras.getString("lineDirection");
+            lastSeen = extras.getString("lastSeen");
+            if (lastSeen == null){
+                Toast.makeText(getApplicationContext(),"Niestety brak informacji od uzytkownikow", Toast.LENGTH_LONG).show();
+            }
         }
-        //Log.i("Zmienne:", busStop + line + direction);
+
+        db = new DataBaseRepository(this);
+
+        Log.i("Zmienne:", busStop + lineName + lineDirection + lastSeen);
         //Sczytanie danych wyszukanie w bazie, wyświetlenie
     }
 
