@@ -3,11 +3,7 @@ package pl.edu.agh.sm.whereisthatbus.app;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,19 +12,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.CountCallback;
-import com.parse.ParseQueryAdapter;
-import com.parse.*;
+import com.parse.ParseException;
+import com.parse.GetCallback;
 
-import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+
 
 public class SearchActivity extends Activity {
     AutoCompleteTextView busStopsNameSearch;
@@ -119,7 +112,7 @@ public class SearchActivity extends Activity {
                 query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());
                 query.whereEqualTo("bus_stop_id", db.getBusStopId(busStopsNameSearch.getText().toString()));
                 query.whereEqualTo("line_direction_id", db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
-                query.setLimit(2);
+                query.setLimit(1);
                 query.getFirstInBackground(new GetCallback<ParseObject>() {
                     public void done(ParseObject object, ParseException e) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
