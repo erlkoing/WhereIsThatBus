@@ -2,6 +2,7 @@ package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -113,6 +114,7 @@ public class SearchActivity extends Activity {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"Prosze czekac, pobierane sa dane", Toast.LENGTH_LONG).show();
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
                 query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());
                 query.whereEqualTo("bus_stop_id", db.getBusStopId(busStopsNameSearch.getText().toString()));
@@ -120,27 +122,23 @@ public class SearchActivity extends Activity {
                 query.setLimit(2);
                 query.getFirstInBackground(new GetCallback<ParseObject>() {
                     public void done(ParseObject object, ParseException e) {
-                        Intent intent = new Intent(SearchActivity.this, DisplayActivity.class);
-
-                        if (object == null) {
-                            Log.d("score", "The getFirst request failed.");//nie udało się pobrać lub nie ma danych w bazie
-                        } else {
-                            intent.putExtra("lastSeen", new SimpleDateFormat("HH:mm").format(object.getCreatedAt()));
-                            Log.d("score", "Retrieved the object.");
+                        AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                        builder.setTitle("Informacja");
+                        if (object != null) {
+                            builder.setMessage("Autobus lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku " + busStopsNameSearch.getText().toString() + " był ostatnio widziany o " + new SimpleDateFormat("HH:mm").format(object.getCreatedAt()));
+                        }else{
+                            builder.setMessage("Brak informacji o autobusie lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku " + busStopsNameSearch.getText().toString());
                         }
-                        //String newstring = new SimpleDateFormat("HH:mm").format(object.getCreatedAt());
-                        intent.putExtra("lineNumber", lineNameSpinnerSearch.getSelectedItem().toString());
-                        intent.putExtra("busStop", busStopsNameSearch.getText().toString());
-                        intent.putExtra("lineDirection", directionSpinnerSearch.getSelectedItem().toString());
-                        //intent.putExtra("lastSeen", object.getDate("createdAt"));
-                        //startActivity(intent);
-                        Log.i("tak", lineNameSpinnerSearch.getSelectedItem().toString());
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                        builder.setMessage("Autobus lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku "+ busStopsNameSearch.getText().toString()+" był ostatnio widziany o "+new SimpleDateFormat("HH:mm").format(object.getCreatedAt())).setTitle("Informacja");
+                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                SearchActivity.this.finish();
+                            }
+                        });
                         AlertDialog dialog = builder.create();
+                        dialog.show();
                     }
                 });
-                //Toast.makeText(getApplicationContext(), "Not implemented", Toast.LENGTH_SHORT).show();
             }
         });
     }
