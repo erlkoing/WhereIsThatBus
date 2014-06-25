@@ -6,6 +6,8 @@ package pl.edu.agh.sm.whereisthatbus.app;
 public class SQLQueries {
     public final static String GET_ALL_BUS_STOPS = "SELECT name FROM Stops";
     public final static String GET_BUS_STOP_ID = "SELECT id FROM Stops WHERE name=?";
+    public final static String GET_BUS_STOPS_COORDS = "SELECT name, lat, lon FROM Stops";
+    public final static String GET_LINE_ID = "SELECT line_id FROM Lines WHERE line_name=? AND last_stop_id=?";
 
 
     public final static String GET_ALL_LINES = "SELECT DISTINCT line_name FROM Lines";

@@ -1,26 +1,28 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.parse.FindCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseException;
-import com.parse.GetCallback;
 
-import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 
 public class SearchActivity extends Activity {
@@ -30,12 +32,15 @@ public class SearchActivity extends Activity {
     Button searchButton;
     DataBaseRepository db;
 
+    List<BusStopCoords> busStopCoordsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         db = new DataBaseRepository(this);
+        busStopCoordsList = db.getBusStopsCoords();
 
         busStopsNameSearch = (AutoCompleteTextView) findViewById(R.id.busStopsNameSearch);
         lineNameSpinnerSearch = (Spinner) findViewById(R.id.lineNameSpinnerSearch);
@@ -51,6 +56,46 @@ public class SearchActivity extends Activity {
         setsearchButtonListeners();
 
         Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setNearestBusStopAsCurrentBusStop();
+    }
+
+    private void setNearestBusStopAsCurrentBusStop() {
+        String nearestBusStop = getNearestBusStopName();
+        busStopsNameSearch.setText(nearestBusStop);
+        busStopsNameSearch.performCompletion();
+        setLineNameSpinnerSearchAdapter(db.getBusStopId(nearestBusStop));
+        setDirectionSpinnerSearchAdapter();
+    }
+
+    private String getNearestBusStopName() {
+        Criteria criteria = new Criteria();
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        String bestLocationProvider = locationManager.getBestProvider(criteria, true);
+        Location location = locationManager.getLastKnownLocation(bestLocationProvider);
+        BusStopCoords nearestBusStop = null;
+
+        double currentLat = location.getLatitude();
+        double currentLon = location.getLongitude();
+        for (BusStopCoords busStopCoords: busStopCoordsList) {
+            if (nearestBusStop == null) {
+                nearestBusStop = busStopCoords;
+            } else {
+                if (distanceBetweenPoints(busStopCoords.lat, busStopCoords.lon, currentLat, currentLon) < distanceBetweenPoints(nearestBusStop.lat, nearestBusStop.lon, currentLat, currentLon)) {
+                    nearestBusStop = busStopCoords;
+                }
+            }
+        }
+
+        return nearestBusStop.busStopName;
+    }
+
+    private double distanceBetweenPoints(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
     }
 
     private void setBusStopsNameSearchAdapter() {
@@ -112,7 +157,28 @@ public class SearchActivity extends Activity {
                 query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());
                 query.whereEqualTo("bus_stop_id", db.getBusStopId(busStopsNameSearch.getText().toString()));
                 query.whereEqualTo("line_direction_id", db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
-                query.setLimit(1);
+                query.whereGreaterThan("report_time", System.currentTimeMillis() - 1000 * 60 * 60);
+
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> parseObjects, ParseException e) {
+                        Toast.makeText(getApplicationContext(),"Dane zostaly pobrane", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),Integer.toString(parseObjects.size()), Toast.LENGTH_LONG).show();
+                        String lineId = db.getLineId(Integer.parseInt(lineNameSpinnerSearch.getSelectedItem().toString()), db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
+                        Toast.makeText(getApplicationContext(),"Line id = " + lineId    , Toast.LENGTH_LONG).show();
+
+                        for (ParseObject parseObject: parseObjects) {
+
+                            Date date = new Date(parseObject.getLong("report_time"));
+                            String messsage = "Autobus linii " + lineNameSpinnerSearch.getSelectedItem().toString() + " byl ostatnio widziany na przystanku " + db.getBusStopName(parseObject.getInt("bus_stop_id")) + "o godzinie " + date.toString();
+
+                            Toast.makeText(getApplicationContext(),messsage, Toast.LENGTH_LONG).show();
+
+                        }
+
+                    }
+                });
+                /*query.setLimit(1);
                 query.getFirstInBackground(new GetCallback<ParseObject>() {
                     public void done(ParseObject object, ParseException e) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
@@ -131,7 +197,7 @@ public class SearchActivity extends Activity {
                         AlertDialog dialog = builder.create();
                         dialog.show();
                     }
-                });
+                });*/
             }
         });
     }

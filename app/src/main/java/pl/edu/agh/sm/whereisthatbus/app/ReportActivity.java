@@ -1,7 +1,9 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
-import android.database.sqlite.SQLiteDatabase;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,10 +20,8 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 
 public class ReportActivity extends Activity {
@@ -32,12 +31,15 @@ public class ReportActivity extends Activity {
     Button reportButton;
     DataBaseRepository db;
 
+    List<BusStopCoords> busStopCoordsList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
 
         db = new DataBaseRepository(this);
+        busStopCoordsList = db.getBusStopsCoords();
 
         busStopsNameReport = (AutoCompleteTextView) findViewById(R.id.busStopsNameReport);
         lineNameSpinnerReport = (Spinner) findViewById(R.id.lineNameSpinnerReport);
@@ -53,6 +55,14 @@ public class ReportActivity extends Activity {
         setReportButtonListeners();
 
         Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
+    }
+
+    private void setNearestBusStopAsCurrentBusStop() {
+        String nearestBusStop = getNearestBusStopName();
+        busStopsNameReport.setText(nearestBusStop);
+        busStopsNameReport.performCompletion();
+        setLineNameSpinnerReportAdapter(db.getBusStopId(nearestBusStop));
+        setDirectionSpinnerReportAdapter();
     }
 
     private void setBusStopsNameReportAdapter() {
@@ -109,11 +119,12 @@ public class ReportActivity extends Activity {
         reportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ParseObject testObject = new ParseObject("ReportObject");
-                testObject.put("bus_stop_id", db.getBusStopId(busStopsNameReport.getText().toString()));
-                testObject.put("line_number", lineNameSpinnerReport.getSelectedItem().toString());
-                testObject.put("line_direction_id", db.getBusStopId(directionSpinnerReport.getSelectedItem().toString()));
-                testObject.saveInBackground(new SaveCallback() {
+                ParseObject reportData = new ParseObject("ReportObject");
+                reportData.put("bus_stop_id", db.getBusStopId(busStopsNameReport.getText().toString()));
+                reportData.put("line_number", lineNameSpinnerReport.getSelectedItem().toString());
+                reportData.put("line_direction_id", db.getBusStopId(directionSpinnerReport.getSelectedItem().toString()));
+                reportData.put("report_time", System.currentTimeMillis());
+                reportData.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
                         afterReport();
@@ -121,6 +132,38 @@ public class ReportActivity extends Activity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setNearestBusStopAsCurrentBusStop();
+    }
+
+    private String getNearestBusStopName() {
+        Criteria criteria = new Criteria();
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        String bestLocationProvider = locationManager.getBestProvider(criteria, true);
+        Location location = locationManager.getLastKnownLocation(bestLocationProvider);
+        BusStopCoords nearestBusStop = null;
+
+        double currentLat = location.getLatitude();
+        double currentLon = location.getLongitude();
+        for (BusStopCoords busStopCoords: busStopCoordsList) {
+            if (nearestBusStop == null) {
+                nearestBusStop = busStopCoords;
+            } else {
+                if (distanceBetweenPoints(busStopCoords.lat, busStopCoords.lon, currentLat, currentLon) < distanceBetweenPoints(nearestBusStop.lat, nearestBusStop.lon, currentLat, currentLon)) {
+                    nearestBusStop = busStopCoords;
+                }
+            }
+        }
+
+        return nearestBusStop.busStopName;
+    }
+
+    private double distanceBetweenPoints(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
     }
 
     private void afterReport() {
