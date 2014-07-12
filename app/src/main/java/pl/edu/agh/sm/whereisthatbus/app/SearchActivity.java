@@ -21,6 +21,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -148,10 +149,42 @@ public class SearchActivity extends Activity {
         });
     }
 
+    private int getActualDayTimeInMinutes() {
+        Calendar calendar = Calendar.getInstance();
+        int currentDayTime = 0;
+        currentDayTime += 60 * calendar.get(Calendar.HOUR_OF_DAY);
+        currentDayTime += calendar.get(Calendar.MINUTE);
+        return currentDayTime;
+    }
+
+    private String getCurrentDayLabel() {
+        Calendar calendar = Calendar.getInstance();
+        return getDayOfTheWeekLabel(calendar.get(Calendar.DAY_OF_WEEK));
+    }
+
+    private String getDayOfTheWeekLabel(int dayOfTheWeek) {
+        if (dayOfTheWeek == 1) return "N";
+        else if(dayOfTheWeek == 7) return "S";
+        else return "T";
+    }
+
+
     private void setsearchButtonListeners() {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int currentTime = getActualDayTimeInMinutes();
+                String dayLabel = getCurrentDayLabel();
+                int stopId = db.getBusStopId(busStopsNameSearch.getText().toString());
+
+
+                Toast.makeText(getApplicationContext(),"Aktualne dane:", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"czas:" + Integer.toString(currentTime), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"day label:" + dayLabel, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"stop id:" + Integer.toString(stopId), Toast.LENGTH_LONG).show();
+
+
+
                 Toast.makeText(getApplicationContext(),"Prosze czekac, pobierane sa dane", Toast.LENGTH_LONG).show();
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
                 query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());

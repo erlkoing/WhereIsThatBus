@@ -12,6 +12,7 @@ import java.util.Vector;
 public class DataBaseRepository {
     BaseDatabaseRepository dataBase;
 
+    /* zwraca liste nazw wszystkich przystanków */
     public List<String> getAllBusStopsNames() {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
@@ -20,12 +21,13 @@ public class DataBaseRepository {
         List<String> busStopsName = new ArrayList<String>();
 
         for (HashMap<String, String> element: queryResult) {
-            busStopsName.add(element.get("name"));
+            busStopsName.add(element.get("stop_name"));
         }
 
         return busStopsName;
     }
 
+    /* zwraca numery wszystkich linii */
     public List<String> getAllLineNames() {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
@@ -34,12 +36,13 @@ public class DataBaseRepository {
         List<String> busStopsName = new ArrayList<String>();
 
         for (HashMap<String, String> element: queryResult) {
-            busStopsName.add(element.get("line_name"));
+            busStopsName.add(element.get("line_number"));
         }
 
         return busStopsName;
     }
 
+    /* zwraca numery linii dla danego przystanku */
     public List<String> getAllLinesForBusStop(String busStopId) {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
@@ -48,13 +51,13 @@ public class DataBaseRepository {
         List<String> linesForBusStop = new ArrayList<String>();
 
         for (HashMap<String, String> element: queryResult) {
-            linesForBusStop.add(element.get("line_name"));
+            linesForBusStop.add(element.get("line_number"));
         }
 
         return linesForBusStop;
     }
 
-    public List<String> getEndStopsForLine(String line) {
+    public List<String> getEndStopIdsForLine(String line) {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
         Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_END_STOPS_FOR_LINE, new String[] { line });
@@ -62,7 +65,7 @@ public class DataBaseRepository {
         List<String> endStopsForLine = new ArrayList<String>();
 
         for (HashMap<String, String> element: queryResult) {
-            endStopsForLine.add(element.get("last_stop_name"));
+            endStopsForLine.add(element.get("last_stop_id"));
         }
 
         return endStopsForLine;
