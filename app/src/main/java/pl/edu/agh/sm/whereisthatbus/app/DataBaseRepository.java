@@ -43,10 +43,10 @@ public class DataBaseRepository {
     }
 
     /* zwraca numery linii dla danego przystanku */
-    public List<String> getAllLinesForBusStop(String busStopId) {
+    public List<String> getAllLinesForBusStop(int busStopId) {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
-        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_ALL_LINES_FOR_BUS_STOP, new String[] { busStopId });
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_ALL_LINES_FOR_BUS_STOP, new String[] { Integer.toString(busStopId) });
         dataBase.closeDatabase();
         List<String> linesForBusStop = new ArrayList<String>();
 
@@ -60,12 +60,12 @@ public class DataBaseRepository {
     public List<String> getEndStopIdsForLine(String line) {
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
-        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_END_STOPS_FOR_LINE, new String[] { line });
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_END_STOPS_NAMES_FOR_LINE, new String[] { line });
         dataBase.closeDatabase();
         List<String> endStopsForLine = new ArrayList<String>();
 
         for (HashMap<String, String> element: queryResult) {
-            endStopsForLine.add(element.get("last_stop_id"));
+            endStopsForLine.add(element.get("stop_name"));
         }
 
         return endStopsForLine;
@@ -79,7 +79,7 @@ public class DataBaseRepository {
         dataBase.closeDatabase();
 
         if (queryResult.size() == 1) {
-            return Integer.parseInt(queryResult.get(0).get("id"));
+            return Integer.parseInt(queryResult.get(0).get("stop_id"));
         } else {
             return -1;
         }
@@ -93,24 +93,37 @@ public class DataBaseRepository {
         dataBase.closeDatabase();
 
         if (queryResult.size() == 1) {
-            return queryResult.get(0).get("name");
+            return queryResult.get(0).get("stop_name");
         } else {
             return "";
         }
     }
 
-    public String getLineId(int lineName, int lastBusStopId) {
+    public String getLineId(String lineName, int lastBusStopId, int stopId) {
+        String lineId = "";
+
         dataBase.createDatabase();
         dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
-        String parameters[] = { Integer.toString(lineName), Integer.toString(lastBusStopId) };
+
+        // pierwsze podejscie
+        String parameters[] = { lineName, Integer.toString(lastBusStopId) };
         Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_LINE_ID, parameters);
-        dataBase.closeDatabase();
 
         if (queryResult.size() == 1) {
-            return queryResult.get(0).get("line_id");
+
+            lineId = queryResult.get(0).get("line_id");
         } else {
-            return "";
+            //drugie podejscie
+            parameters[2] += Integer.toString(stopId);
+            queryResult = dataBase.executeQuery(SQLQueries.GET_LINE_ID2, parameters);
+            if (queryResult.size() > 0) {
+                lineId = queryResult.get(0).get("line_id");
+            }
         }
+
+        dataBase.closeDatabase();
+
+        return lineId;
     }
 
     public List<BusStopCoords> getBusStopsCoords() {
@@ -121,12 +134,12 @@ public class DataBaseRepository {
 
         List<BusStopCoords> busStopsCoords = new ArrayList<BusStopCoords>();
         for (HashMap<String, String> element: queryResult) {
-            if (element.get("lon").isEmpty() || element.get("lat").isEmpty())
+            if (element.get("longitude").isEmpty() || element.get("latitude").isEmpty())
                 continue;
 
-            String busStopName = element.get("name");
-            double lat = Double.parseDouble(element.get("lat"));
-            double lon = Double.parseDouble(element.get("lon"));
+            String busStopName = element.get("stop_name");
+            double lat = Double.parseDouble(element.get("latitude"));
+            double lon = Double.parseDouble(element.get("longitude"));
 
             busStopsCoords.add(new BusStopCoords(busStopName, lat, lon));
         }

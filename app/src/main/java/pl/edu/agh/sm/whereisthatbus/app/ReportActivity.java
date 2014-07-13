@@ -20,7 +20,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -76,7 +75,7 @@ public class ReportActivity extends Activity {
         if (busStopId == -1) {
             adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLineNames());
         } else {
-            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLinesForBusStop(Integer.toString(busStopId)));
+            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLinesForBusStop(busStopId));
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lineNameSpinnerReport.setAdapter(adapter);
@@ -84,7 +83,7 @@ public class ReportActivity extends Activity {
 
     private void setDirectionSpinnerReportAdapter() {
         String line = lineNameSpinnerReport.getSelectedItem().toString();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getEndStopsForLine(line));
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getEndStopIdsForLine(line));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         directionSpinnerReport.setAdapter(adapter);
     }

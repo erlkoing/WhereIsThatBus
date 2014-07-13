@@ -53,8 +53,8 @@ public class SearchActivity extends Activity {
         setDirectionSpinnerSearchAdapter();
 
         setBusStopsNameSearchListeners();
-        setlineNameSpinnerSearchListeners();
-        setsearchButtonListeners();
+        setLineNameSpinnerSearchListeners();
+        setSearchButtonListeners();
 
         Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
     }
@@ -110,7 +110,7 @@ public class SearchActivity extends Activity {
         if (busStopId == -1) {
             adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLineNames());
         } else {
-            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLinesForBusStop(Integer.toString(busStopId)));
+            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLinesForBusStop(busStopId));
         }
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lineNameSpinnerSearch.setAdapter(adapter);
@@ -118,7 +118,7 @@ public class SearchActivity extends Activity {
 
     private void setDirectionSpinnerSearchAdapter() {
         String line = lineNameSpinnerSearch.getSelectedItem().toString();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getEndStopsForLine(line));
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getEndStopIdsForLine(line));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         directionSpinnerSearch.setAdapter(adapter);
     }
@@ -135,7 +135,7 @@ public class SearchActivity extends Activity {
         });
     }
 
-    private void setlineNameSpinnerSearchListeners() {
+    private void setLineNameSpinnerSearchListeners() {
         lineNameSpinnerSearch.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -169,19 +169,24 @@ public class SearchActivity extends Activity {
     }
 
 
-    private void setsearchButtonListeners() {
+    private void setSearchButtonListeners() {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int currentTime = getActualDayTimeInMinutes();
                 String dayLabel = getCurrentDayLabel();
-                int stopId = db.getBusStopId(busStopsNameSearch.getText().toString());
+                final int stopId = db.getBusStopId(busStopsNameSearch.getText().toString());
 
+                String lineName = lineNameSpinnerSearch.getSelectedItem().toString();
+                int lineDirectionId = db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString());
+
+                String lineId = db.getLineId(lineName, lineDirectionId, stopId);
 
                 Toast.makeText(getApplicationContext(),"Aktualne dane:", Toast.LENGTH_LONG).show();
                 Toast.makeText(getApplicationContext(),"czas:" + Integer.toString(currentTime), Toast.LENGTH_LONG).show();
                 Toast.makeText(getApplicationContext(),"day label:" + dayLabel, Toast.LENGTH_LONG).show();
                 Toast.makeText(getApplicationContext(),"stop id:" + Integer.toString(stopId), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"line id: " + lineId, Toast.LENGTH_LONG).show();
 
 
 
@@ -197,7 +202,7 @@ public class SearchActivity extends Activity {
                     public void done(List<ParseObject> parseObjects, ParseException e) {
                         Toast.makeText(getApplicationContext(),"Dane zostaly pobrane", Toast.LENGTH_LONG).show();
                         Toast.makeText(getApplicationContext(),Integer.toString(parseObjects.size()), Toast.LENGTH_LONG).show();
-                        String lineId = db.getLineId(Integer.parseInt(lineNameSpinnerSearch.getSelectedItem().toString()), db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
+                        String lineId = db.getLineId(lineNameSpinnerSearch.getSelectedItem().toString(), db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()), stopId);
                         Toast.makeText(getApplicationContext(),"Line id = " + lineId    , Toast.LENGTH_LONG).show();
 
                         for (ParseObject parseObject: parseObjects) {
