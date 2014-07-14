@@ -147,6 +147,112 @@ public class DataBaseRepository {
         return busStopsCoords;
     }
 
+    public String getNearestConnectionId(int time, String lineId, int stopId, String dayType) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { Integer.toString(time), Integer.toString(time), lineId, Integer.toString(stopId), dayType };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_NEAREST_CONNECTION_ID_FOR_LINE_ID_ON_STOP_ID, parameters);
+        dataBase.closeDatabase();
+
+        String connectionId = "";
+
+        if (queryResult.size() == 1) {
+            connectionId = queryResult.get(0).get("connection_id");
+        }
+
+        return connectionId;
+    }
+
+    public int getStopPlacement(String lineId, int stopId) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { lineId, Integer.toString(stopId) };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_STOP_ID_PLACEMENT_IN_LINE_ID, parameters);
+        dataBase.closeDatabase();
+
+        int stopIdPlacement = -1;
+
+        if (queryResult.size() == 1) {
+            stopIdPlacement = Integer.parseInt(queryResult.get(0).get("line_stop_no"));
+        }
+
+        return stopIdPlacement;
+    }
+
+    public int getTimeBeenFirstAndCurrentBusStopForConnection(String connectionId, int currentBusStopId) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { connectionId, Integer.toString(currentBusStopId) };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_CONNECTION_ID_TIMES_BETWEEN_FIRST_AND_CURRENT_STOP, parameters);
+        dataBase.closeDatabase();
+
+        int timeBetweenBusStops = -1;
+
+        if (queryResult.size() == 2) {
+            timeBetweenBusStops = Math.abs(Integer.parseInt(queryResult.get(0).get("time")) - Integer.parseInt(queryResult.get(1).get("time")));
+        }
+
+        return timeBetweenBusStops;
+    }
+
+    public int getTimeBeetweenBusStops(String connectionId, int busStopId1, int busStopId2) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { connectionId, Integer.toString(busStopId1), Integer.toString(busStopId2) };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_CONNECTION_ID_TIMES_BETWEEN_BUS_STOPS, parameters);
+        dataBase.closeDatabase();
+
+        int timeBetweenBusStops = -1;
+
+        if (queryResult.size() == 2) {
+            timeBetweenBusStops = Math.abs(Integer.parseInt(queryResult.get(0).get("time")) - Integer.parseInt(queryResult.get(1).get("time")));
+        }
+
+        return timeBetweenBusStops;
+    }
+
+    public int getDeltaTimeBetweenNearestConnections(int time, String lineId, int stopId, String dayType) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { Integer.toString(time), Integer.toString(time), lineId, Integer.toString(stopId), dayType };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_TWO_NEAREST_FUTURE_CONNECTIONS_TIME, parameters);
+        dataBase.closeDatabase();
+
+        int deltaBetweenConnections = 5;
+
+        if (queryResult.size() == 2) {
+            deltaBetweenConnections = Math.abs(Integer.parseInt(queryResult.get(0).get("time")) - Integer.parseInt(queryResult.get(1).get("time")));
+            if (deltaBetweenConnections > 4) {
+                deltaBetweenConnections /= 2;
+            }
+        }
+
+        return deltaBetweenConnections;
+    }
+
+    public int getNearestConnectionTimeArrival(int time, String lineId, int stopId, String dayType) {
+        dataBase.createDatabase();
+        dataBase.openDatabase(SQLiteDatabase.OPEN_READONLY);
+
+        String parameters[] = { Integer.toString(time), lineId, Integer.toString(stopId), dayType };
+        Vector<HashMap<String, String>> queryResult = dataBase.executeQuery(SQLQueries.GET_NEAREST_CONNECTION_TIME, parameters);
+        dataBase.closeDatabase();
+
+        int minutes = -1;
+
+        if (queryResult.size() == 1) {
+            minutes = Integer.parseInt(queryResult.get(0).get("minumum"));
+        }
+
+        return minutes;
+    }
+
+
     DataBaseRepository(Context context) {
         dataBase = new BaseDatabaseRepository(context);
     }

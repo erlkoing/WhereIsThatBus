@@ -1,10 +1,15 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -21,7 +27,10 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +40,7 @@ public class SearchActivity extends Activity {
     Spinner lineNameSpinnerSearch;
     Spinner directionSpinnerSearch;
     Button searchButton;
+    ImageButton refreshButton;
     DataBaseRepository db;
 
     List<BusStopCoords> busStopCoordsList;
@@ -47,6 +57,7 @@ public class SearchActivity extends Activity {
         lineNameSpinnerSearch = (Spinner) findViewById(R.id.lineNameSpinnerSearch);
         directionSpinnerSearch = (Spinner) findViewById(R.id.directionSpinnerSearch);
         searchButton = (Button) findViewById(R.id.searchButton);
+        refreshButton = (ImageButton) findViewById(R.id.refreshButtonSearch);
 
         setBusStopsNameSearchAdapter();
         setLineNameSpinnerSearchAdapter(-1);
@@ -55,6 +66,7 @@ public class SearchActivity extends Activity {
         setBusStopsNameSearchListeners();
         setLineNameSpinnerSearchListeners();
         setSearchButtonListeners();
+        setRefreshButtonListeners();
 
         Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
     }
@@ -168,76 +180,148 @@ public class SearchActivity extends Activity {
         else return "T";
     }
 
+    private int convertDateToMinutest(Date date) {
+        int dayTimeMinutes = 0;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int hours = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+
+        dayTimeMinutes = 60 * hours;
+        dayTimeMinutes += minutes;
+
+        return dayTimeMinutes;
+    }
+
+    private void setRefreshButtonListeners() {
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setNearestBusStopAsCurrentBusStop();
+            }
+        });
+    }
 
     private void setSearchButtonListeners() {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int currentTime = getActualDayTimeInMinutes();
-                String dayLabel = getCurrentDayLabel();
-                final int stopId = db.getBusStopId(busStopsNameSearch.getText().toString());
 
-                String lineName = lineNameSpinnerSearch.getSelectedItem().toString();
-                int lineDirectionId = db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString());
+                if (isInternetConnection(getApplicationContext())) {
+                    final int currentTime = getActualDayTimeInMinutes();
+                    final String dayLabel = getCurrentDayLabel();
+                    final int stopId = db.getBusStopId(busStopsNameSearch.getText().toString());
 
-                String lineId = db.getLineId(lineName, lineDirectionId, stopId);
+                    String lineName = lineNameSpinnerSearch.getSelectedItem().toString();
+                    int lineDirectionId = db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString());
 
-                Toast.makeText(getApplicationContext(),"Aktualne dane:", Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(),"czas:" + Integer.toString(currentTime), Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(),"day label:" + dayLabel, Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(),"stop id:" + Integer.toString(stopId), Toast.LENGTH_LONG).show();
-                Toast.makeText(getApplicationContext(),"line id: " + lineId, Toast.LENGTH_LONG).show();
+                    final String lineId = db.getLineId(lineName, lineDirectionId, stopId);
+                    final String connectionId = db.getNearestConnectionId(currentTime, lineId, stopId, dayLabel);
 
+                    int timeDifferenceBetweenFirstAndCurrentBusStop = db.getTimeBeenFirstAndCurrentBusStopForConnection(connectionId, stopId);
+                    int stopPlacement = db.getStopPlacement(lineId, stopId);
 
+                    Toast.makeText(getApplicationContext(),"Proszę czekać, pobierane są dane", Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(getApplicationContext(),"Prosze czekac, pobierane sa dane", Toast.LENGTH_LONG).show();
-                ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
-                query.whereEqualTo("line_number", lineNameSpinnerSearch.getSelectedItem().toString());
-                query.whereEqualTo("bus_stop_id", db.getBusStopId(busStopsNameSearch.getText().toString()));
-                query.whereEqualTo("line_direction_id", db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()));
-                query.whereGreaterThan("report_time", System.currentTimeMillis() - 1000 * 60 * 60);
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
+                    query.whereEqualTo("line_number", lineName);
+                    query.whereEqualTo("line_id", lineId);
+                    query.whereEqualTo("line_direction_id", lineDirectionId);
+                    query.whereLessThan("stop_placement", stopPlacement); // zeby nie brac pod uwage polaczen rejestrowanych na kolejnych przystankach na trasie
+                    query.whereGreaterThan("report_time", (System.currentTimeMillis() - 1000 * 60 * timeDifferenceBetweenFirstAndCurrentBusStop) / 1000); // zeby zawedzic czas wyszukiwania
 
-                query.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(List<ParseObject> parseObjects, ParseException e) {
-                        Toast.makeText(getApplicationContext(),"Dane zostaly pobrane", Toast.LENGTH_LONG).show();
-                        Toast.makeText(getApplicationContext(),Integer.toString(parseObjects.size()), Toast.LENGTH_LONG).show();
-                        String lineId = db.getLineId(lineNameSpinnerSearch.getSelectedItem().toString(), db.getBusStopId(directionSpinnerSearch.getSelectedItem().toString()), stopId);
-                        Toast.makeText(getApplicationContext(),"Line id = " + lineId    , Toast.LENGTH_LONG).show();
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> parseObjects, ParseException e) {
+                            List<Integer> minutesToArrive = new ArrayList<Integer>();
+                            List<ReportData> reportDataList = new ArrayList<ReportData>();
+                            for (ParseObject parseObject: parseObjects) {
+                                int reportStopId = parseObject.getInt("bus_stop_id");
+                                int timeBetweenBusStops = db.getTimeBeetweenBusStops(connectionId, reportStopId, stopId);
 
-                        for (ParseObject parseObject: parseObjects) {
+                                long reportTimeInMiliseconds = parseObject.getLong("report_time") * 1000;
+                                long estimatedTimeOfArrival = reportTimeInMiliseconds + timeBetweenBusStops * 60*1000;
+                                Date estimatedDateOfArrival = new Date(estimatedTimeOfArrival);
 
-                            Date date = new Date(parseObject.getLong("report_time"));
-                            String messsage = "Autobus linii " + lineNameSpinnerSearch.getSelectedItem().toString() + " byl ostatnio widziany na przystanku " + db.getBusStopName(parseObject.getInt("bus_stop_id")) + "o godzinie " + date.toString();
+                                int expectedArrivalTime = convertDateToMinutest(estimatedDateOfArrival) - convertDateToMinutest(new Date(System.currentTimeMillis()));
 
-                            Toast.makeText(getApplicationContext(),messsage, Toast.LENGTH_LONG).show();
-
-                        }
-
-                    }
-                });
-                /*query.setLimit(1);
-                query.getFirstInBackground(new GetCallback<ParseObject>() {
-                    public void done(ParseObject object, ParseException e) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
-                        builder.setTitle("Informacja");
-                        if (object != null) {
-                            builder.setMessage("Autobus lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku " + busStopsNameSearch.getText().toString() + " był ostatnio widziany o " + new SimpleDateFormat("HH:mm").format(object.getCreatedAt()));
-                        }else{
-                            builder.setMessage("Brak informacji o autobusie lini " + lineNameSpinnerSearch.getSelectedItem().toString() + " z przystanku " + busStopsNameSearch.getText().toString());
-                        }
-                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                SearchActivity.this.finish();
+                                if (expectedArrivalTime >=0)
+                                    reportDataList.add(new ReportData(reportTimeInMiliseconds, expectedArrivalTime));
                             }
-                        });
-                        AlertDialog dialog = builder.create();
-                        dialog.show();
-                    }
-                });*/
+
+                            String message = "";
+
+                            if (reportDataList.size() > 1) {
+                                Collections.sort(reportDataList, new ReportDataComparator());
+                                Collections.reverse(reportDataList);
+
+                                int deltaT = db.getDeltaTimeBetweenNearestConnections(currentTime, lineId, stopId, dayLabel);
+                                for (ReportData reportData: reportDataList) {
+                                    if (minutesToArrive.size() == 0) {
+                                        minutesToArrive.add(reportData.minutestToArrive);
+                                    } else {
+                                        boolean add = true;
+                                        for (Integer i: minutesToArrive) {
+                                            if (Math.abs(i - reportData.minutestToArrive) - deltaT < 0) {
+                                                //add = false;
+                                            }
+                                        }
+
+                                        if (add) {
+                                            minutesToArrive.add(reportData.minutestToArrive);
+                                        }
+                                    }
+                                }
+                                Collections.sort(minutesToArrive);
+                                message = "Najbliższe połączenie za: " + minutesToArrive.get(0).toString() + " minut";
+                                if(minutesToArrive.size() > 1) {
+                                    message += "\nKolejne połączenia za: ";
+                                    for (int i = 1; i < minutesToArrive.size() - 1; i++) {
+                                        message += minutesToArrive.get(i) + ", ";
+                                    }
+                                    message += minutesToArrive.get(minutesToArrive.size() - 1);
+                                }
+                                message += "\nNajblizsze planowane połączenie za: " + db.getNearestConnectionTimeArrival(currentTime, lineId, stopId, dayLabel) + " minut";
+
+                            } else if (reportDataList.size() == 1) {
+                                minutesToArrive.add(reportDataList.get(0).minutestToArrive);
+                                message = "Najbliższe połączenie za: " + minutesToArrive.get(0).toString() + " minut";
+                                message += "\nNajblizsze planowane połączenie za: " + db.getNearestConnectionTimeArrival(currentTime, lineId, stopId, dayLabel) + " minut";
+                            } else if (reportDataList.size() == 0) {
+                                message = "Brak informacji o połączeniach podanej linii.";
+                                message += "\nNajblizsze planowane połączenie za: " + db.getNearestConnectionTimeArrival(currentTime, lineId, stopId, dayLabel) + " minut";
+                            }
+
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
+                            builder.setTitle("Informacja");
+                            builder.setMessage(message);
+
+                            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    SearchActivity.this.finish();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
+    }
+
+    private boolean isInternetConnection(Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isAvailable() && connectivityManager.getActiveNetworkInfo().isConnected())
+            return true;
+        else
+            return false;
     }
 
     @Override
@@ -257,5 +341,27 @@ public class SearchActivity extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+}
+
+class ReportData {
+    long reportTime;
+    int minutestToArrive;
+
+    public ReportData( long reportTime, int minutestToArrive) {
+        this.reportTime = reportTime;
+        this.minutestToArrive = minutestToArrive;
+    }
+}
+
+class ReportDataComparator implements Comparator<ReportData> {
+
+    @Override
+    public int compare(ReportData o1, ReportData o2) {
+        if (o1.reportTime >= o2.reportTime) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 }

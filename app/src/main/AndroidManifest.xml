@@ -29,10 +29,6 @@
             android:name=".ReportActivity"
             android:label="@string/title_activity_report" >
         </activity>
-        <activity
-            android:name=".DisplayActivity"
-            android:label="@string/title_activity_display" >
-        </activity>
     </application>
 
 </manifest>

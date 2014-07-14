@@ -1,9 +1,12 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -28,6 +32,7 @@ public class ReportActivity extends Activity {
     Spinner lineNameSpinnerReport;
     Spinner directionSpinnerReport;
     Button reportButton;
+    ImageButton refreshButton;
     DataBaseRepository db;
 
     List<BusStopCoords> busStopCoordsList;
@@ -44,6 +49,8 @@ public class ReportActivity extends Activity {
         lineNameSpinnerReport = (Spinner) findViewById(R.id.lineNameSpinnerReport);
         directionSpinnerReport = (Spinner) findViewById(R.id.directionSpinnerReport);
         reportButton = (Button) findViewById(R.id.reportButton);
+        refreshButton = (ImageButton) findViewById(R.id.refreshButtonReport);
+
 
         setBusStopsNameReportAdapter();
         setLineNameSpinnerReportAdapter(-1);
@@ -52,6 +59,7 @@ public class ReportActivity extends Activity {
         setBusStopsNameReportListeners();
         setLineNameSpinnerReportListeners();
         setReportButtonListeners();
+        setRefreshButtonListeners();
 
         Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
     }
@@ -114,23 +122,53 @@ public class ReportActivity extends Activity {
         });
     }
 
+    private void setRefreshButtonListeners() {
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setNearestBusStopAsCurrentBusStop();
+            }
+        });
+    }
+
     private void setReportButtonListeners() {
         reportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ParseObject reportData = new ParseObject("ReportObject");
-                reportData.put("bus_stop_id", db.getBusStopId(busStopsNameReport.getText().toString()));
-                reportData.put("line_number", lineNameSpinnerReport.getSelectedItem().toString());
-                reportData.put("line_direction_id", db.getBusStopId(directionSpinnerReport.getSelectedItem().toString()));
-                reportData.put("report_time", System.currentTimeMillis());
-                reportData.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        afterReport();
-                    }
-                });
+                if (isInternetConnection()) {
+                    ParseObject reportData = new ParseObject("ReportObject");
+                    int stopId = db.getBusStopId(busStopsNameReport.getText().toString());
+                    String lineNumber = lineNameSpinnerReport.getSelectedItem().toString();
+                    int lastStopId = db.getBusStopId(directionSpinnerReport.getSelectedItem().toString());
+                    String lineId = db.getLineId(lineNumber, lastStopId, stopId);
+                    reportData.put("bus_stop_id", stopId);
+                    reportData.put("stop_placement", db.getStopPlacement(lineId, stopId));
+                    reportData.put("line_id", lineId);
+                    reportData.put("line_number", lineNumber);
+                    reportData.put("line_direction_id", lastStopId);
+                    reportData.put("report_time", System.currentTimeMillis() / 1000);
+
+                    reportData.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            afterReport();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
+
+    private boolean isInternetConnection() {
+            ConnectivityManager cm =(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                return true;
+            }
+            return false;
+
     }
 
     @Override
@@ -166,7 +204,7 @@ public class ReportActivity extends Activity {
     }
 
     private void afterReport() {
-        Toast.makeText(getApplicationContext(), "Report Send", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Wysłano informację o połączeniu", Toast.LENGTH_SHORT).show();
         this.finish();
     }
 

@@ -9,18 +9,29 @@
     android:orientation="vertical"
     tools:context="pl.edu.agh.sm.whereisthatbus.app.SearchActivity">
 
-    <TextView
-        android:text="SEARCH ACTIVITY"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <AutoCompleteTextView
-        android:id="@+id/busStopsNameSearch"
-        android:hint="Podaj nazwę przystanku"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:ems="8" />
+        android:orientation="horizontal">
 
+        <AutoCompleteTextView
+            android:id="@+id/busStopsNameSearch"
+            android:hint="Podaj nazwę przystanku"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="8" />
+
+        <ImageButton
+            android:id="@+id/refreshButtonSearch"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+
+            android:src="@drawable/refresh_location"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"/>
+
+    </LinearLayout>
     <Spinner
         android:id="@+id/lineNameSpinnerSearch"
         android:layout_width="match_parent"
