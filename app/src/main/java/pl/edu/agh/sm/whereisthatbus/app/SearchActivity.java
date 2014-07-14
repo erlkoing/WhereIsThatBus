@@ -264,7 +264,7 @@ public class SearchActivity extends Activity {
                                         boolean add = true;
                                         for (Integer i: minutesToArrive) {
                                             if (Math.abs(i - reportData.minutestToArrive) - deltaT < 0) {
-                                                //add = false;
+                                                add = false;
                                             }
                                         }
 
