@@ -64,7 +64,7 @@ public class ReportActivity extends BaseActivityFunctions {
             ParseObject reportData = createReport();
 
             if (reportData == null)
-                Toast.makeText(getApplicationContext(), "Wprowadzone dane nie są poprawne.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.invalid_input_data), Toast.LENGTH_LONG).show();
             else
                 reportData.saveInBackground(new SaveCallback() {
                     @Override
@@ -74,7 +74,7 @@ public class ReportActivity extends BaseActivityFunctions {
                 });
 
         } else
-            Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -103,7 +103,7 @@ public class ReportActivity extends BaseActivityFunctions {
      * Funkcja wywolywana po udanym wyslaniu danych na serwer. Funkcja wyswietla stosowna informacje oraz zamyka aktywnosc.
      */
     private void afterReport() {
-        Toast.makeText(getApplicationContext(), "Wysłano informację o połączeniu", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), getString(R.string.report_send), Toast.LENGTH_SHORT).show();
         this.finish();
     }
 
@@ -131,7 +131,7 @@ public class ReportActivity extends BaseActivityFunctions {
      */
     private ParseObject createReportObject(int stopId, int lastStopId, int stopPlacement, String lineId, String lineNumber) {
         // umieszczenie danych w obiekcje Report
-        ParseObject reportData = new ParseObject("ReportObject");
+        ParseObject reportData = new ParseObject(getString(R.string.parse_object_name));
         reportData.put("bus_stop_id", stopId);
         reportData.put("stop_placement", stopPlacement);
         reportData.put("line_id", lineId);

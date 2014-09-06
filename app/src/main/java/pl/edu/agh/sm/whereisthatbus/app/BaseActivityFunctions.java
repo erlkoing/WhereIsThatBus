@@ -51,8 +51,8 @@ public abstract class BaseActivityFunctions extends Activity {
 
         db = new DataBaseRepository(this);
         busStopCoordsList = db.getBusStopsCoords();
-        prefs = this.getSharedPreferences("pl.edu.agh.sm.whereisthatbus", Context.MODE_PRIVATE);
-        Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9"); // inicjalizacja parsa do przesylania odbierania danych z serwera
+        prefs = this.getSharedPreferences(getString(R.string.shared_preferences_path), Context.MODE_PRIVATE);
+        Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key)); // inicjalizacja parsa do przesylania odbierania danych z serwera
     }
 
     @Override
@@ -60,9 +60,9 @@ public abstract class BaseActivityFunctions extends Activity {
         super.onResume();
 
         // sprawdzanie czy jest wlaczone automatyczne wykrywanie najblizszego przystanku
-        boolean autoLocation = prefs.getBoolean("auto location", true);
-        if (!prefs.contains("auto location"))
-            prefs.edit().putBoolean("auto location", autoLocation).commit();
+        boolean autoLocation = prefs.getBoolean(getString(R.string.sp_auto_location), true);
+        if (!prefs.contains(getString(R.string.sp_auto_location)))
+            prefs.edit().putBoolean(getString(R.string.sp_auto_location), autoLocation).commit();
 
         if (autoLocation)
             setNearestBusStopAsCurrentBusStop();
@@ -159,7 +159,7 @@ public abstract class BaseActivityFunctions extends Activity {
     protected void setBusStopsNameAdapter() {
         ArrayAdapter<String> adapter;
 
-        List<String> busStopsNames = new ArrayList<String>(prefs.getStringSet("bus stops names", null));
+        List<String> busStopsNames = new ArrayList<String>(prefs.getStringSet(getString(R.string.sp_bus_stops_names), null));
         if (busStopsNames.isEmpty())
             adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllBusStopsNames());
         else {
@@ -234,9 +234,9 @@ public abstract class BaseActivityFunctions extends Activity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        boolean autoLocation = prefs.getBoolean("auto location", true);
-        if (!prefs.contains("auto location"))
-            prefs.edit().putBoolean("auto location", autoLocation).commit();
+        boolean autoLocation = prefs.getBoolean(getString(R.string.sp_auto_location), true);
+        if (!prefs.contains(getString(R.string.sp_auto_location)))
+            prefs.edit().putBoolean(getString(R.string.sp_auto_location), autoLocation).commit();
 
         menu.findItem(R.id.auto_location).setChecked(autoLocation);
         return true;
@@ -246,7 +246,7 @@ public abstract class BaseActivityFunctions extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.auto_location) {
-            prefs.edit().putBoolean("auto location", !item.isChecked()).commit();
+            prefs.edit().putBoolean(getString(R.string.sp_auto_location), !item.isChecked()).commit();
             item.setChecked(!item.isChecked());
 
             if (item.isChecked())

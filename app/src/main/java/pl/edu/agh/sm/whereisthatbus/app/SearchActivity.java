@@ -77,13 +77,13 @@ public class SearchActivity extends BaseActivityFunctions {
 
             ParseQuery<ParseObject> query = createQuery(queryRawData);
             if (query == null)
-                Toast.makeText(getApplicationContext(), "Wprowadzone dane nie są poprawne.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.invalid_input_data), Toast.LENGTH_LONG).show();
             else {
-                Toast.makeText(getApplicationContext(), "Proszę czekać, pobierane są dane", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.please_wait_fetching_data), Toast.LENGTH_SHORT).show();
                 sendQuery(query, queryRawData);
             }
         } else {
-            Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -187,7 +187,7 @@ public class SearchActivity extends BaseActivityFunctions {
      * @return obiekt zapytania do serwera
      */
     private ParseQuery<ParseObject> createParseQuery(String lineName, String lineId, int lineDirectionId, int stopPlacement, int timeDifferenceBetweenFirstAndCurrentBusStop) {
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("ReportObject");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery(getString(R.string.parse_object_name));
         query.whereEqualTo("line_number", lineName);
         query.whereEqualTo("line_id", lineId);
         query.whereEqualTo("line_direction_id", lineDirectionId);
@@ -225,16 +225,16 @@ public class SearchActivity extends BaseActivityFunctions {
         // w przypadku gdzy mamy jakies zgloszenie
         if (minutesToArrive.size() >= 1) {
             int nearestConnection = minutesToArrive.get(0);
-            sb.append("Najblizsze polaczenie za: " + nearestConnection + " ");
+            sb.append(getString(R.string.nearest_connection_in) + nearestConnection + " ");
             if (nearestConnection == 1) {
-                sb.append("minute\n");
+                sb.append(getString(R.string.one_minute) + "\n");
             } else {
-                sb.append("minut\n");
+                sb.append(getString(R.string.minutes) + "\n");
             }
 
             // dodatkowa informacja jesli zgloszen jest wiecej
             if (minutesToArrive.size() > 1) {
-                sb.append("Kolejne za: ");
+                sb.append(getString(R.string.next_connections_in));
                 for (int i = 1; i < minutesToArrive.size() - 1; i++) {
                     sb.append(minutesToArrive.get(i) + ", ");
                 }
@@ -242,15 +242,15 @@ public class SearchActivity extends BaseActivityFunctions {
                 sb.append("\n");
             }
         } else {
-            sb.append("Brak zgloszen o połączeniach podanej linii.\n");
+            sb.append(getString(R.string.no_reports_for_connection) + "\n");
         }
 
         int nearestScheduledConnection = db.getNearestConnectionTimeArrival(queryRawData.getCurrentTime(), queryRawData.getLineId(), queryRawData.getBusStopId(), queryRawData.getDayLabel());
-        sb.append("Najblizsze połączenie wg. rozkladu za: " + nearestScheduledConnection + " ");
+        sb.append(getString(R.string.nearest_scheduled_connection_in) + nearestScheduledConnection + " ");
         if (nearestScheduledConnection == 1) {
-            sb.append("minute\n");
+            sb.append(getString(R.string.one_minute) + "\n");
         } else {
-            sb.append("minut\n");
+            sb.append(getString(R.string.minutes) + "\n");
         }
 
         return sb.toString();
@@ -263,10 +263,10 @@ public class SearchActivity extends BaseActivityFunctions {
      */
     private void showMessage(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
-        builder.setTitle("Informacja");
+        builder.setTitle(getString(R.string.dialog_title));
         builder.setMessage(message);
 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.dialog_title), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 SearchActivity.this.finish();

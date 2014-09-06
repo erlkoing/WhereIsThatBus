@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         db = new DataBaseRepository(this);
 
         // inicjalizacja SharedPreferences
-        prefs = this.getSharedPreferences("pl.edu.agh.sm.whereisthatbus", Context.MODE_PRIVATE);
+        prefs = this.getSharedPreferences(getString(R.string.shared_preferences_path), Context.MODE_PRIVATE);
 
         // przypisanie elementow do obiektow
         search = (Button) findViewById(R.id.search);
@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
      */
     private void loadBusStopsNames() {
         Set<String> busStopsNames = new HashSet<String>(db.getAllBusStopsNames());
-        prefs.edit().putStringSet("bus stops names", busStopsNames).commit();
+        prefs.edit().putStringSet(getString(R.string.sp_bus_stops_names), busStopsNames).commit();
     }
 
     /**
@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
      */
     private void loadLinesNames() {
         Set<String> lineNames = new HashSet<String>(db.getAllLineNames());
-        prefs.edit().putStringSet("lines names", lineNames).commit();
+        prefs.edit().putStringSet(getString(R.string.sp_lines_names), lineNames).commit();
     }
 
     /**
@@ -104,9 +104,9 @@ public class MainActivity extends Activity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
-        boolean autoLocation = prefs.getBoolean("auto location", true);
-        if (!prefs.contains("auto location"))
-            prefs.edit().putBoolean("auto location", autoLocation).commit();
+        boolean autoLocation = prefs.getBoolean(getString(R.string.sp_auto_location), true);
+        if (!prefs.contains(getString(R.string.sp_auto_location)))
+            prefs.edit().putBoolean(getString(R.string.sp_auto_location), autoLocation).commit();
 
         menu.findItem(R.id.auto_location).setChecked(autoLocation);
 
@@ -117,7 +117,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.auto_location) {
-            prefs.edit().putBoolean("auto location", !item.isChecked()).commit();
+            prefs.edit().putBoolean(getString(R.string.sp_auto_location), !item.isChecked()).commit();
             item.setChecked(!item.isChecked());
 
             return true;
