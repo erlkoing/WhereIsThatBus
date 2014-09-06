@@ -266,7 +266,7 @@ public class SearchActivity extends BaseActivityFunctions {
         builder.setTitle(getString(R.string.dialog_title));
         builder.setMessage(message);
 
-        builder.setPositiveButton(getString(R.string.dialog_title), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.dialog_confirm), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 SearchActivity.this.finish();
