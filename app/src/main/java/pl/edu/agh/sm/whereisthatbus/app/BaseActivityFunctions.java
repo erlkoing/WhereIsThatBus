@@ -15,6 +15,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.parse.Parse;
 
@@ -72,18 +73,25 @@ public abstract class BaseActivityFunctions extends Activity {
      * Funkcja oblicza i ustawia najblizyszy przystanek jako biezacy przystanek
      */
     protected void setNearestBusStopAsCurrentBusStop() {
-        // pobranie nazwy najblizszego przystanku
-        String nearestBusStop = getNearestBusStopName();
+        GPSTracker gpsTracker = new GPSTracker(this);
+        if (gpsTracker.canGetLocation()) {
+            // pobranie nazwy najblizszego przystanku
+            String nearestBusStop = getNearestBusStopName();
 
-        // ustawienie nazwy przystanku w EditTexcie
-        busStopsName.setText(nearestBusStop);
-        busStopsName.performCompletion();
+            // ustawienie nazwy przystanku w EditTexcie
+            busStopsName.setText(nearestBusStop);
+            busStopsName.performCompletion();
 
-        // ustawia linie, które kursuja przez podany przystanek
-        setLineNameSpinnerAdapter(db.getBusStopId(nearestBusStop));
+            // ustawia linie, które kursuja przez podany przystanek
+            setLineNameSpinnerAdapter(db.getBusStopId(nearestBusStop));
 
-        // ustawia kierunek dla biezacej linii
-        setDirectionSpinnerAdapter();
+            // ustawia kierunek dla biezacej linii
+            setDirectionSpinnerAdapter();
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.could_not_get_location), Toast.LENGTH_LONG).show();
+        }
+
+        gpsTracker.stopUsingGPS();
     }
 
     /**

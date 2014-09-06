@@ -8,7 +8,7 @@
     <string name="search">Wyszukaj połączenia</string>
     <string name="report">Poinformuj o połączeniu</string>
 
-    <string name="_button_report">Zgłoś</string>
+    <string name="button_report">Zgłoś</string>
     <string name="button_search">Szukaj</string>
 
     <string name="title_activity_search">Wyszukaj połączenia</string>
@@ -40,6 +40,7 @@
     <string name="parse_application_id">V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP</string>
     <string name="parse_client_key">mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9</string>
     <string name="parse_object_name">ReportObject</string>
+    <string name="could_not_get_location">Nie można określić położenia. Zmień ustawienia lokalizacji.</string>
 
 
 </resources>
