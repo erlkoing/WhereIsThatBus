@@ -1,7 +1,7 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 /**
- * Created by piotrek on 29.05.14.
+ * Klasa zawiera zapytania SQL do bazy danych
  */
 public class SQLQueries {
     public final static String GET_ALL_BUS_STOPS = "SELECT stop_name FROM Stops";
@@ -31,4 +31,6 @@ public class SQLQueries {
     public final static String GET_TWO_NEAREST_FUTURE_CONNECTIONS_TIME = "SELECT time, MIN((time - ?), (1440 - (time - ?))) AS minumum FROM StopDepartures WHERE line_id=? AND stop_id=? AND day_type=?  and minumum > 0 ORDER BY minumum LIMIT 2";
 
     public final static String GET_NEAREST_CONNECTION_TIME = "SELECT (time - ?) AS minumum FROM StopDepartures WHERE line_id=? AND stop_id=? AND day_type=? AND minumum > 0 ORDER BY minumum LIMIT 1";
+
+    public final static String VALIDATE_QUERY = "SELECT COUNT(*) AS rows FROM StopDepartures INNER JOIN Lines ON Lines.line_id = StopDepartures.line_id  WHERE Lines.line_id=? AND stop_id=? AND line_stop_no=?";
 }
