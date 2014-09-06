@@ -1,5 +1,11 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,20 +14,15 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Vector;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-
+/**
+ * Klasa dzieki, ktorej mozemy zarzadzac baza danych.
+ */
 public class BaseDatabaseRepository extends SQLiteOpenHelper
 {
-	protected Context context;
-	protected SQLiteDatabase database;
 	private final static String DATABASE_NAME = "rozklad.sqlite" ;
-	
-	
+    private Context context;
+    private SQLiteDatabase database;
+
 	public BaseDatabaseRepository(Context context)
 	{
 		super(context, DATABASE_NAME, null, 1);
