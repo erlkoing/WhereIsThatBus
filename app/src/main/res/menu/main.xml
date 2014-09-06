@@ -1,9 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="pl.edu.agh.sm.whereisthatbus.app.MainActivity" >
-    <item android:id="@+id/action_settings"
-        android:title="@string/action_settings"
+    tools:context="pl.edu.agh.sm.whereisthatbus.app.MainActivity">
+    <item
+        android:id="@+id/auto_location"
+        android:checkable="true"
         android:orderInCategory="100"
+        android:title="Wykryj przystanek"
         app:showAsAction="never" />
 </menu>
