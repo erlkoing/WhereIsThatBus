@@ -1,229 +1,159 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
-import android.app.Activity;
-import android.content.Context;
-import android.location.Criteria;
-import android.location.Location;
-import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
-import java.util.List;
-
-
-public class ReportActivity extends Activity {
-    AutoCompleteTextView busStopsNameReport;
-    Spinner lineNameSpinnerReport;
-    Spinner directionSpinnerReport;
-    Button reportButton;
-    ImageButton refreshButton;
-    DataBaseRepository db;
-
-    List<BusStopCoords> busStopCoordsList;
+/**
+ * klasa odpwoiedzialna za wysylanie raportow na temat polaczen do serwera
+ */
+public class ReportActivity extends BaseActivityFunctions {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report);
-
-        db = new DataBaseRepository(this);
-        busStopCoordsList = db.getBusStopsCoords();
-
-        busStopsNameReport = (AutoCompleteTextView) findViewById(R.id.busStopsNameReport);
-        lineNameSpinnerReport = (Spinner) findViewById(R.id.lineNameSpinnerReport);
-        directionSpinnerReport = (Spinner) findViewById(R.id.directionSpinnerReport);
-        reportButton = (Button) findViewById(R.id.reportButton);
-        refreshButton = (ImageButton) findViewById(R.id.refreshButtonReport);
-
-
-        setBusStopsNameReportAdapter();
-        setLineNameSpinnerReportAdapter(-1);
-        setDirectionSpinnerReportAdapter();
-
-        setBusStopsNameReportListeners();
-        setLineNameSpinnerReportListeners();
-        setReportButtonListeners();
-        setRefreshButtonListeners();
-
-        Parse.initialize(this, "V6fkKxIRViQ7S7Ftje0VlFca7y64iBoHBKi3yhBP", "mXh0C4i7FdILIiqzErEb15FcOOMguHou7LzpmpG9");
-    }
-
-    private void setNearestBusStopAsCurrentBusStop() {
-        String nearestBusStop = getNearestBusStopName();
-        busStopsNameReport.setText(nearestBusStop);
-        busStopsNameReport.performCompletion();
-        setLineNameSpinnerReportAdapter(db.getBusStopId(nearestBusStop));
-        setDirectionSpinnerReportAdapter();
-    }
-
-    private void setBusStopsNameReportAdapter() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllBusStopsNames());
-        busStopsNameReport.setAdapter(adapter);
-        busStopsNameReport.setThreshold(1);
-    }
-
-    private void setLineNameSpinnerReportAdapter(int busStopId) {
-        ArrayAdapter<String> adapter;
-        if (busStopId == -1) {
-            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLineNames());
-        } else {
-            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getAllLinesForBusStop(busStopId));
-        }
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        lineNameSpinnerReport.setAdapter(adapter);
-    }
-
-    private void setDirectionSpinnerReportAdapter() {
-        String line = lineNameSpinnerReport.getSelectedItem().toString();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, db.getEndStopIdsForLine(line));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        directionSpinnerReport.setAdapter(adapter);
-    }
-
-    private void setBusStopsNameReportListeners() {
-        busStopsNameReport.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String busStopName = busStopsNameReport.getText().toString();
-                int busStopId = db.getBusStopId(busStopName);
-                setLineNameSpinnerReportAdapter(busStopId);
-                setDirectionSpinnerReportAdapter();
-            }
-        });
-    }
-
-    private void setLineNameSpinnerReportListeners() {
-        lineNameSpinnerReport.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                setDirectionSpinnerReportAdapter();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-    }
-
-    private void setRefreshButtonListeners() {
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setNearestBusStopAsCurrentBusStop();
-            }
-        });
-    }
-
-    private void setReportButtonListeners() {
-        reportButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isInternetConnection()) {
-                    ParseObject reportData = new ParseObject("ReportObject");
-                    int stopId = db.getBusStopId(busStopsNameReport.getText().toString());
-                    String lineNumber = lineNameSpinnerReport.getSelectedItem().toString();
-                    int lastStopId = db.getBusStopId(directionSpinnerReport.getSelectedItem().toString());
-                    String lineId = db.getLineId(lineNumber, lastStopId, stopId);
-                    reportData.put("bus_stop_id", stopId);
-                    reportData.put("stop_placement", db.getStopPlacement(lineId, stopId));
-                    reportData.put("line_id", lineId);
-                    reportData.put("line_number", lineNumber);
-                    reportData.put("line_direction_id", lastStopId);
-                    reportData.put("report_time", System.currentTimeMillis() / 1000);
-
-                    reportData.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            afterReport();
-                        }
-                    });
-                } else {
-                    Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private boolean isInternetConnection() {
-            ConnectivityManager cm =(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-                return true;
-            }
-            return false;
-
+        setUIActivityElements();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setNearestBusStopAsCurrentBusStop();
+    protected void setUIActivityElements() {
+        busStopsName = (AutoCompleteTextView) findViewById(R.id.busStopsNameReport);
+        lineNameSpinner = (Spinner) findViewById(R.id.lineNameSpinnerReport);
+        directionSpinner = (Spinner) findViewById(R.id.directionSpinnerReport);
+        actionButton = (Button) findViewById(R.id.reportButton);
+        refreshButton = (ImageButton) findViewById(R.id.refreshButtonReport);
+
+        setBusStopsNameAdapter();
+        setLineNameSpinnerAdapter(-1);
+        setDirectionSpinnerAdapter();
+
+        setBusStopsNameListeners();
+        setLineNameSpinnerListeners();
+        setActionButtonListeners();
+        setRefreshButtonListeners();
     }
 
-    private String getNearestBusStopName() {
-        Criteria criteria = new Criteria();
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        String bestLocationProvider = locationManager.getBestProvider(criteria, true);
-        Location location = locationManager.getLastKnownLocation(bestLocationProvider);
-        BusStopCoords nearestBusStop = null;
-
-        double currentLat = location.getLatitude();
-        double currentLon = location.getLongitude();
-        for (BusStopCoords busStopCoords: busStopCoordsList) {
-            if (nearestBusStop == null) {
-                nearestBusStop = busStopCoords;
-            } else {
-                if (distanceBetweenPoints(busStopCoords.lat, busStopCoords.lon, currentLat, currentLon) < distanceBetweenPoints(nearestBusStop.lat, nearestBusStop.lon, currentLat, currentLon)) {
-                    nearestBusStop = busStopCoords;
-                }
+    /**
+     * Funkcja ustawia odpowiednia akcje po nacisnieciu przycisku wyslij
+     */
+    protected void setActionButtonListeners() {
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendReport();
             }
-        }
-
-        return nearestBusStop.busStopName;
+        });
     }
 
-    private double distanceBetweenPoints(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
+    /**
+     * Funkcja odpowiedzialna za wyspanie raportu o polaczeniu na serwer lub wyswietleniu odpowiedniej informacji jezeli nie ma takiej mozliwosci
+     */
+    private void sendReport() {
+        if (isInternetConnection(getApplicationContext())) {
+            ParseObject reportData = createReport();
+
+            if (reportData == null)
+                Toast.makeText(getApplicationContext(), "Wprowadzone dane nie są poprawne.", Toast.LENGTH_LONG).show();
+            else
+                reportData.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        afterReport();
+                    }
+                });
+
+        } else
+            Toast.makeText(getApplicationContext(), "Brak połączenia z internetem.", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Funkcja odpowiedzialna za pobranie informacji z interfejsu, sprawdzenie ich poprawnosci oraz utworzenie odpowiedniego obiektu
+     *
+     * @return obiekt ReportObject jesli dane sa poprawne. W przeciwnym razie null.
+     */
+    private ParseObject createReport() {
+        // pobranie danych potrzebnych do stworzenia obiektu Report
+        String busStopName = busStopsName.getText().toString();
+        int stopId = db.getBusStopId(busStopName);
+        String lineNumber = lineNameSpinner.getSelectedItem().toString();
+        String lastStopName = directionSpinner.getSelectedItem().toString();
+        int lastStopId = db.getBusStopId(lastStopName);
+        String lineId = db.getLineId(lineNumber, lastStopId, stopId);
+        int stopPlacement = db.getStopPlacement(lineId, stopId);
+
+        // sprawdzenie poprawnosci pobranych danych
+        if (isReportDataValid(lineId, stopId, stopPlacement))
+            return createReportObject(stopId, lastStopId, stopPlacement, lineId, lineNumber);
+        else
+            return null;
+    }
+
+    /**
+     * Funkcja wywolywana po udanym wyslaniu danych na serwer. Funkcja wyswietla stosowna informacje oraz zamyka aktywnosc.
+     */
     private void afterReport() {
         Toast.makeText(getApplicationContext(), "Wysłano informację o połączeniu", Toast.LENGTH_SHORT).show();
         this.finish();
     }
 
+    /**
+     * Funkcja ma za zadanie sprawdzic czy wprowadzone dane sa poprawne.
+     *
+     * @param lineId        id linii
+     * @param stopId        id przystanku
+     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia
+     * @return true jesli dane sa poprawne, false w przeciwnym razie
+     */
+    private boolean isReportDataValid(String lineId, int stopId, int stopPlacement) {
+        return db.validate(lineId, stopId, stopPlacement);
+    }
+
+    /**
+     * Funkcja tworzy obiekt parsa - ReportObject, ktory zawira dane, ktore maja zostac umieszone na serwerze.
+     *
+     * @param stopId        id przystanku, z ktorego jest wysylany raport
+     * @param lastStopId    id przystanku koncowego dla zglaszanej linii
+     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia
+     * @param lineId        id zglaszanej linii
+     * @param lineNumber    numer linii
+     * @return obiekt parsa zawirajacy informacje o polaczeniu
+     */
+    private ParseObject createReportObject(int stopId, int lastStopId, int stopPlacement, String lineId, String lineNumber) {
+        // umieszczenie danych w obiekcje Report
+        ParseObject reportData = new ParseObject("ReportObject");
+        reportData.put("bus_stop_id", stopId);
+        reportData.put("stop_placement", stopPlacement);
+        reportData.put("line_id", lineId);
+        reportData.put("line_number", lineNumber);
+        reportData.put("line_direction_id", lastStopId);
+        reportData.put("report_time", System.currentTimeMillis() / 1000);
+
+        return reportData;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.report, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 }
