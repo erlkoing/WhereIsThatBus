@@ -1,16 +1,28 @@
 package pl.edu.agh.sm.whereisthatbus.app;
 
 /**
- * Created by piotrek on 16.06.14.
+ * Klasa pomocnicza majaca za zadanie przechowywac wspolrzedne przystanku
  */
 public class BusStopCoords {
-    final String busStopName;
-    final double lat;
-    final double lon;
+    private final String busStopName;
+    private final double lat;
+    private final double lon;
 
     BusStopCoords(String busStopName, double lat, double lon) {
         this.busStopName = busStopName;
         this.lat = lat;
         this.lon = lon;
+    }
+
+    public String getBusStopName() {
+        return busStopName;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public double getLon() {
+        return lon;
     }
 }
