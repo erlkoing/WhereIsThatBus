@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="8"
-            android:hint="Podaj nazwę przystanku" />
+            android:hint="@string/enter_bus_stop_name" />
 
         <ImageButton
             android:id="@+id/refreshButtonSearch"
@@ -32,6 +32,7 @@
             android:src="@drawable/refresh_location" />
 
     </LinearLayout>
+
     <Spinner
         android:id="@+id/lineNameSpinnerSearch"
         android:layout_width="match_parent"
@@ -51,5 +52,4 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_search" />
-
 </LinearLayout>

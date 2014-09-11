@@ -7,6 +7,7 @@
     <string name="action_settings">Ustawienia</string>
     <string name="search">Wyszukaj połączenia</string>
     <string name="report">Poinformuj o połączeniu</string>
+    <string name="enter_bus_stop_name">Podaj nazwę przystanku</string>
 
     <string name="button_report">Zgłoś</string>
     <string name="button_search">Szukaj</string>

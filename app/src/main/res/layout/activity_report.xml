@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="8"
-            android:hint="Podaj nazwę przystanku" />
+            android:hint="@string/enter_bus_stop_name" />
 
         <ImageButton
             android:id="@+id/refreshButtonReport"
@@ -51,6 +51,6 @@
         android:id="@+id/reportButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/_button_report" />
+        android:text="@string/button_report" />
 
 </LinearLayout>
