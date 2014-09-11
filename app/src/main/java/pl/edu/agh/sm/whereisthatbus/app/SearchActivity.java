@@ -225,7 +225,7 @@ public class SearchActivity extends BaseActivityFunctions {
         // w przypadku gdzy mamy jakies zgloszenie
         if (minutesToArrive.size() >= 1) {
             int nearestConnection = minutesToArrive.get(0);
-            sb.append(getString(R.string.nearest_connection_in) + nearestConnection + " ");
+            sb.append(getString(R.string.nearest_connection_in) + " " + nearestConnection + " ");
             if (nearestConnection == 1) {
                 sb.append(getString(R.string.one_minute) + "\n");
             } else {
@@ -234,7 +234,7 @@ public class SearchActivity extends BaseActivityFunctions {
 
             // dodatkowa informacja jesli zgloszen jest wiecej
             if (minutesToArrive.size() > 1) {
-                sb.append(getString(R.string.next_connections_in));
+                sb.append(getString(R.string.next_connections_in) + " ");
                 for (int i = 1; i < minutesToArrive.size() - 1; i++) {
                     sb.append(minutesToArrive.get(i) + ", ");
                 }
@@ -246,7 +246,7 @@ public class SearchActivity extends BaseActivityFunctions {
         }
 
         int nearestScheduledConnection = db.getNearestConnectionTimeArrival(queryRawData.getCurrentTime(), queryRawData.getLineId(), queryRawData.getBusStopId(), queryRawData.getDayLabel());
-        sb.append(getString(R.string.nearest_scheduled_connection_in) + nearestScheduledConnection + " ");
+        sb.append(getString(R.string.nearest_scheduled_connection_in) + " " + nearestScheduledConnection + " ");
         if (nearestScheduledConnection == 1) {
             sb.append(getString(R.string.one_minute) + "\n");
         } else {
