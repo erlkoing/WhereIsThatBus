@@ -27,10 +27,10 @@
     <string name="no_internet_connection">Brak połączenia z internetem</string>
     <string name="report_send">Wysłano informację o połączeniu</string>
     <string name="please_wait_fetching_data">Proszę czekać, pobierane są dane</string>
-    <string name="nearest_connection_in">Najblizsze polaczenie za </string>
-    <string name="next_connections_in">Kolejne za </string>
+    <string name="nearest_connection_in">Najblizsze polaczenie za</string>
+    <string name="next_connections_in">Kolejne za</string>
     <string name="no_reports_for_connection">Brak zgloszen o połączeniach podanej linii.</string>
-    <string name="nearest_scheduled_connection_in">Najblizsze połączenie wg. rozkladu za </string>
+    <string name="nearest_scheduled_connection_in">Najblizsze połączenie według rozkladu za</string>
     <string name="one_minute">minute</string>
     <string name="minutes">minut</string>
 
