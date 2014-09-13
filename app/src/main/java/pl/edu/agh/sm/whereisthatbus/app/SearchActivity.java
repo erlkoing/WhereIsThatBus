@@ -227,9 +227,9 @@ public class SearchActivity extends BaseActivityFunctions {
             int nearestConnection = minutesToArrive.get(0);
             sb.append(getString(R.string.nearest_connection_in) + " " + nearestConnection + " ");
             if (nearestConnection == 1) {
-                sb.append(getString(R.string.one_minute) + "\n");
+                sb.append(getString(R.string.one_minute) + ".\n");
             } else {
-                sb.append(getString(R.string.minutes) + "\n");
+                sb.append(getString(R.string.minutes) + ".\n");
             }
 
             // dodatkowa informacja jesli zgloszen jest wiecej
@@ -239,7 +239,7 @@ public class SearchActivity extends BaseActivityFunctions {
                     sb.append(minutesToArrive.get(i) + ", ");
                 }
                 sb.append(minutesToArrive.get(minutesToArrive.size() - 1));
-                sb.append("\n");
+                sb.append(".\n");
             }
         } else {
             sb.append(getString(R.string.no_reports_for_connection) + "\n");
@@ -248,9 +248,9 @@ public class SearchActivity extends BaseActivityFunctions {
         int nearestScheduledConnection = db.getNearestConnectionTimeArrival(queryRawData.getCurrentTime(), queryRawData.getLineId(), queryRawData.getBusStopId(), queryRawData.getDayLabel());
         sb.append(getString(R.string.nearest_scheduled_connection_in) + " " + nearestScheduledConnection + " ");
         if (nearestScheduledConnection == 1) {
-            sb.append(getString(R.string.one_minute) + "\n");
+            sb.append(getString(R.string.one_minute) + ".\n");
         } else {
-            sb.append(getString(R.string.minutes) + "\n");
+            sb.append(getString(R.string.minutes) + ".\n");
         }
 
         return sb.toString();
