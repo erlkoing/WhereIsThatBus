@@ -23,7 +23,12 @@ public class BaseDatabaseRepository extends SQLiteOpenHelper
     private Context context;
     private SQLiteDatabase database;
 
-	public BaseDatabaseRepository(Context context)
+    /**
+     * Konstruktor zapisujacy przeslany kontekt aplikacji.
+     *
+     * @param context kontekst aplikacji.
+     */
+    public BaseDatabaseRepository(Context context)
 	{
 		super(context, DATABASE_NAME, null, 1);
 		this.context = context;

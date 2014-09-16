@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Klasa odpowiedzialna za kierowanie zapytan do bazy danych oraz obrobke ich wynikow
+ * Klasa odpowiedzialna za kierowanie zapytan do bazy danych oraz obrobke ich wynikow na potrzeby aplikacji.
  */
 public class DataBaseRepository {
     private BaseDatabaseRepository dataBase;
@@ -19,8 +19,8 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funkcja zwraca nazwy wszystkich przystankow znajdujace sie w bazie danych
-     * @return nazwy wszystkich przystankow
+     * Funkcja zwraca nazwy wszystkich przystankow znajdujacych sie w bazie danych.
+     * @return nazwy wszystkich przystankow.
      */
     public List<String> getAllBusStopsNames() {
         dataBase.createDatabase();
@@ -38,7 +38,7 @@ public class DataBaseRepository {
 
     /**
      * Funkcja zwraca nazwy wszystkich linii znajdujacych sie w bazie danych
-     * @return nazwy wszystkich linii
+     * @return nazwy wszystkich linii.
      */
     public List<String> getAllLineNames() {
         dataBase.createDatabase();
@@ -55,9 +55,9 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funckja zwraca nazwy linii, ktore zatrzymuja sie na danym przystanku
-     * @param busStopId id przystanku lda ktorego dokonujemy zapytania
-     * @return numery linii, ktore zatrzymuja sie na przystanku
+     * Funckja zwraca nazwy linii, ktore zatrzymuja sie na danym przystanku.
+     * @param busStopId id przystanku, dla ktorego dokonujemy zapytania.
+     * @return numery linii, ktore zatrzymuja sie na przystanku.
      */
     public List<String> getAllLinesForBusStop(int busStopId) {
         dataBase.createDatabase();
@@ -74,9 +74,9 @@ public class DataBaseRepository {
     }
 
     /**
-     * Zwraca id ostatniego przystanku dla podanej linii
-     * @param line id linii
-     * @return id przystanku
+     * Funckja zwraca id koncowego przystanku dla podanego id linii.
+     * @param line id linii.
+     * @return id przystanku.
      */
     public List<String> getEndStopIdsForLine(String line) {
         dataBase.createDatabase();
@@ -93,9 +93,9 @@ public class DataBaseRepository {
     }
 
     /**
-     * Mapuje nazwe przystanku na jego id
-     * @param busStopName nazwa przystanku
-     * @return id przystanku
+     * Funkcja mapuje nazwe przystanku na jego id.
+     * @param busStopName nazwa przystanku.
+     * @return id przystanku.
      */
     public int getBusStopId(String busStopName) {
         dataBase.createDatabase();
@@ -112,9 +112,9 @@ public class DataBaseRepository {
     }
 
     /**
-     * Mapuje id przystanku na jego nazwe
-     * @param busStopId id przystanku
-     * @return nazwa przystanku
+     * Funkcja mapuje id przystanku na jego nazwe.
+     * @param busStopId id przystanku.
+     * @return nazwa przystanku.
      */
     public String getBusStopName(int busStopId) {
         dataBase.createDatabase();
@@ -133,10 +133,10 @@ public class DataBaseRepository {
     /**
      * Funkcja zwraca id linii na podstawie nazwy linii, przystanku koncowego oraz przystanku po trasie.
      * Czasami nie wystarcza pierwsze dwa parametry i trzeba dolozyc jeszcze trzeci.
-     * @param lineName nazwa linii
-     * @param lastBusStopId id ostatniego przystanku dla linii
-     * @param stopId przystanek po trasie linii
-     * @return id linii lub pusty string
+     * @param lineName nazwa linii.
+     * @param lastBusStopId id ostatniego przystanku dla linii.
+     * @param stopId przystanek po trasie linii.
+     * @return id linii lub pusty string.
      */
     public String getLineId(String lineName, int lastBusStopId, int stopId) {
         String lineId = "";
@@ -167,8 +167,8 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funckja zwraca liste wspolrzednych dla przystankow
-     * @return lista wspolrzednych przystankow
+     * Funckja zwraca liste zawierajaca wsolrzedne i nazwe wszystkich przystankow.
+     * @return lista obiektow zawierajacych nazwe i wspolrzedne wszystkich przystankow.
      */
     public List<BusStopCoords> getBusStopsCoords() {
         dataBase.createDatabase();
@@ -193,11 +193,11 @@ public class DataBaseRepository {
 
     /**
      * Funkcja zwraca id najblizszego polaczenia dla zadanych argumentow.
-     * @param time czas wyrazony w minutach, ktore uplynely od polnocy
-     * @param lineId id linii
-     * @param stopId id przystanku
-     * @param dayType flaga okreslajaca dzien tygodnia
-     * @return id najblizszego polaczenia
+     * @param time czas wyrazony w minutach, ktore uplynely od polnocy.
+     * @param lineId id linii.
+     * @param stopId id przystanku.
+     * @param dayType flaga okreslajaca dzien tygodnia. "T", "S", "N".
+     * @return id najblizszego polaczenia.
      */
     public String getNearestConnectionId(int time, String lineId, int stopId, String dayType) {
         dataBase.createDatabase();
@@ -217,10 +217,10 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funkcja zwraca pozycje przystanku dla podanej linie id
-     * @param lineId id linii
-     * @param stopId id przystanku
-     * @return pozycja przystanku dla line id
+     * Funkcja zwraca pozycje przystanku dla podanej linii.
+     * @param lineId id linii.
+     * @param stopId id przystanku.
+     * @return pozycja przystanku w danej linii.
      */
     public int getStopPlacement(String lineId, int stopId) {
         dataBase.createDatabase();
@@ -240,9 +240,9 @@ public class DataBaseRepository {
     }
 
     /**
-     * Zwraca czas pomiedzy pierwszym i aktualnym przystankiem dla podanego polaczenia
-     * @param connectionId id polaczenia
-     * @param currentBusStopId id aktualnego przystanku
+     * Zwraca czas pomiedzy pierwszym i aktualnym przystankiem dla podanego polaczenia.
+     * @param connectionId id polaczenia.
+     * @param currentBusStopId id aktualnego przystanku.
      * @return czas w minutach pomiedzy przystankami. W przypadku niepowodzenia -1.
      */
     public int getTimeBeetweenFirstAndCurrentBusStopForConnection(String connectionId, int currentBusStopId) {
@@ -263,10 +263,10 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funkcja zwraca czas pomiedzy przystankami dla danego polaczenia
-     * @param connectionId id polaczenia
-     * @param busStopId1 id pierwszego przystanku
-     * @param busStopId2 id drugiego przystanku
+     * Funkcja zwraca czas pomiedzy przystankami dla danego polaczenia.
+     * @param connectionId id polaczenia.
+     * @param busStopId1 id pierwszego przystanku.
+     * @param busStopId2 id drugiego przystanku.
      * @return czas w minutach pomiedzy przystankami. W przypadku niepowodzenia -1.
      */
     public int getTimeBeetweenBusStops(String connectionId, int busStopId1, int busStopId2) {
@@ -287,12 +287,12 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funckaj oblicza roznice czasowa pomiedzy dwoma kolejnymi polaczeniami
-     * @param time czas po ktorym beda wyszukiwane polaczenia
-     * @param lineId id linii
-     * @param stopId id przystanku
-     * @param dayType rodzaj dnia
-     * @return czas pomiedzy dwoma kolejnymi planowanymi polaczeniami podzielony na 3
+     * Funckaj oblicza roznice czasowa pomiedzy dwoma kolejnymi polaczeniami.
+     * @param time czas, po ktorym beda wyszukiwane polaczenia.
+     * @param lineId id linii.
+     * @param stopId id przystanku.
+     * @param dayType rodzaj dnia. "T", "S", "N"
+     * @return czas pomiedzy dwoma kolejnymi planowanymi polaczeniami podzielony na 3.
      */
     public int getDeltaTimeBetweenNearestConnections(int time, String lineId, int stopId, String dayType) {
         dataBase.createDatabase();
@@ -314,13 +314,13 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funkcja zwraca za ile minut planowo autobus powienien przyjechac na przystanek
+     * Funkcja zwraca za ile minut planowo autobus powienien przyjechac na przystanek bazujac na rozkladzie.
      *
-     * @param time    aktualny czas
-     * @param lineId  id linii
-     * @param stopId  id przystanku
-     * @param dayType rodzaj dnia
-     * @return liczba minut do planowego przyjazdu autobusu na przystanek
+     * @param time    aktualny czas.
+     * @param lineId  id linii.
+     * @param stopId  id przystanku.
+     * @param dayType rodzaj dnia. rodzaj dnia. "T", "S", "N"
+     * @return liczba minut do planowego przyjazdu autobusu na przystanek.
      */
     public int getNearestConnectionTimeArrival(int time, String lineId, int stopId, String dayType) {
         dataBase.createDatabase();
@@ -338,12 +338,12 @@ public class DataBaseRepository {
     }
 
     /**
-     * Funkcja sprawdzajaca czy podany zestaw parametrow jest prawidlowy
+     * Funkcja sprawdzajaca czy podany zestaw parametrow jest prawidlowy.
      *
-     * @param lineId        id linii
-     * @param stopId        id przystanku
-     * @param stopPlacement umiejscowienie przystanku
-     * @return true jezeli dane sa poprawne, false w przeciwnym razie
+     * @param lineId        id linii.
+     * @param stopId        id przystanku.
+     * @param stopPlacement umiejscowienie przystanku.
+     * @return true jezeli dane sa poprawne, false w przeciwnym razie.
      */
     public boolean validate(String lineId, int stopId, int stopPlacement) {
         dataBase.createDatabase();

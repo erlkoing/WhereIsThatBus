@@ -15,7 +15,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Poczatkowe activity, w ktorym wybieramy co bedziemy robic: czy zglaszac czy szukac
+ * Poczatkowe activity, w ktorym wybieramy co bedziemy robic: zglaszac czy szukac.
+ * Nastepuje tutaj rowniez ladowanie nazw przystankow i linii do sharedpreferences.
  */
 public class MainActivity extends Activity {
 
@@ -47,10 +48,10 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Funkcja ustawia listenery dla przyciskow
+     * Funkcja ustawia listenery dla przyciskow.
      */
     private void setListeners() {
-        // przycisniecie przycisku przypisanego do "search" spowoduje wywołanie  funkcji startSearchActivity()
+        // przycisniecie przycisku przypisanego do "search" spowoduje wywolanie  funkcji startSearchActivity()
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // przycisniecie przycisku przypisanego do "report" spowoduje wywołanie  funkcji startReportActivity()
+        // przycisniecie przycisku przypisanego do "report" spowoduje wywolanie  funkcji startReportActivity()
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * funkcja laduje nazwy przystankow do sharedpreferences
+     * Funkcja laduje nazwy przystankow do sharedpreferences.
      */
     private void loadBusStopsNames() {
         Set<String> busStopsNames = new HashSet<String>(db.getAllBusStopsNames());
@@ -76,7 +77,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * funkcja laduje nazwy przystankow do sharedpreferences
+     * Funkcja laduje nazwy przystankow do sharedpreferences.
      */
     private void loadLinesNames() {
         Set<String> lineNames = new HashSet<String>(db.getAllLineNames());
@@ -84,7 +85,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Funkcja uruchamia SearchArctivity
+     * Funkcja uruchamia SearchArctivity.
      */
     private void startSearchActivity() {
         Intent i = new Intent(this, SearchActivity.class);
@@ -92,7 +93,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Funkcja uruchamia ReportActivity
+     * Funkcja uruchamia ReportActivity.
      */
     private void startReportActivity() {
         Intent i = new Intent(this, ReportActivity.class);

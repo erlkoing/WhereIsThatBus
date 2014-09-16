@@ -4,13 +4,13 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Klasa zawiera funkcje manipulujace czasem na potrzeby aplikacji
+ * Klasa zawiera funkcje manipulujace czasem na potrzeby aplikacji.
  */
 public class TimeTool {
     /**
-     * Funkcja zwraca "godzine" w minutach
+     * Funkcja zwraca "godzine" w minutach.
      *
-     * @return zwraca liczbe minut, ktore uplynely od polnocy
+     * @return zwraca liczbe minut, ktore uplynely od polnocy.
      */
     public int getActualDayTimeInMinutes() {
         Calendar calendar = Calendar.getInstance();
@@ -21,9 +21,9 @@ public class TimeTool {
     }
 
     /**
-     * Funkcja zwraca znacznik okreslajacy dzien tygodnia danego dnia
+     * Funkcja zwraca znacznik okreslajacy dzien tygodnia danego dnia.
      *
-     * @return "N" jesli dany dzien jest niedziela, "S" jesli dany dzien jest sobota lub "T" jesli dany dzien jest zwyklym dniem tygodnia
+     * @return "N" jesli dany dzien jest niedziela, "S" jesli dany dzien jest sobota lub "T" jesli dany dzien jest zwyklym dniem tygodnia.
      */
     public String getCurrentDayLabel() {
         Calendar calendar = Calendar.getInstance();
@@ -31,10 +31,10 @@ public class TimeTool {
     }
 
     /**
-     * Funkcja zwraca znacznik okreslajacy dzien tygodnia dla podanego dnia
+     * Funkcja zwraca znacznik okreslajacy dzien tygodnia dla podanego dnia.
      *
      * @param dayOfTheWeek argument z przedzialu od 1-7 okreslajacy polozenie dnia tygodnia. Zaczynamy liczyc od niedzieli (1).
-     * @return "N" jesli dany dzien jest niedziela, "S" jesli dany dzien jest sobota lub "T" jesli dany dzien jest zwyklym dniem tygodnia
+     * @return "N" jesli dany dzien jest niedziela, "S" jesli dany dzien jest sobota lub "T" jesli dany dzien jest zwyklym dniem tygodnia.
      */
     public String getDayOfTheWeekLabel(int dayOfTheWeek) {
         if (dayOfTheWeek == 1) return "N";
@@ -43,10 +43,10 @@ public class TimeTool {
     }
 
     /**
-     * Funkcja na podstawie daty zamienia godzine z daty na liczbe minut, ktore uplynely od polnocy
+     * Funkcja na podstawie daty zamienia godzine z daty na liczbe minut, ktore uplynely od polnocy.
      *
-     * @param date data, która konwertujemy
-     * @return zwraca liczbe minut, ktore uplynely od polnocy
+     * @param date data, ktora konwertujemy.
+     * @return liczba minut, ktore uplynely od polnocy.
      */
     public int convertDateToMinutest(Date date) {
         Calendar calendar = Calendar.getInstance();

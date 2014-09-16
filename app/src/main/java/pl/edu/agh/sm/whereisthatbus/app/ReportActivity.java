@@ -15,7 +15,7 @@ import com.parse.ParseObject;
 import com.parse.SaveCallback;
 
 /**
- * klasa odpwoiedzialna za wysylanie raportow na temat polaczen do serwera
+ * Activity odpowiedzialne za tworzenie i przesylanie raportow o polaczeniach do serwera.
  */
 public class ReportActivity extends BaseActivityFunctions {
 
@@ -26,6 +26,9 @@ public class ReportActivity extends BaseActivityFunctions {
         setUIActivityElements();
     }
 
+    /**
+     * Funkcja przypisuje do obiektow odpowiednie elementy interfejsu oraz ustawia dla nich adaptery, litenery.
+     */
     @Override
     protected void setUIActivityElements() {
         busStopsName = (AutoCompleteTextView) findViewById(R.id.busStopsNameReport);
@@ -45,7 +48,7 @@ public class ReportActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja ustawia odpowiednia akcje po nacisnieciu przycisku wyslij
+     * Funkcja ustawia odpowiednia akcje po nacisnieciu przycisku wyslij.
      */
     protected void setActionButtonListeners() {
         actionButton.setOnClickListener(new View.OnClickListener() {
@@ -57,7 +60,7 @@ public class ReportActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja odpowiedzialna za wyspanie raportu o polaczeniu na serwer lub wyswietleniu odpowiedniej informacji jezeli nie ma takiej mozliwosci
+     * Funkcja odpowiedzialna za wyslanie raportu o polaczeniu na serwer lub wyswietlenie odpowiedniej informacji jezeli nie ma mozliwosci przeslania (np. brak polaczenia z internetem).
      */
     private void sendReport() {
         if (isInternetConnection(getApplicationContext())) {
@@ -78,9 +81,9 @@ public class ReportActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja odpowiedzialna za pobranie informacji z interfejsu, sprawdzenie ich poprawnosci oraz utworzenie odpowiedniego obiektu
+     * Funkcja odpowiedzialna za pobranie informacji z interfejsu, sprawdzenie ich poprawnosci oraz utworzenie odpowiedniego obiektu jezeli dane sa poprawne.
      *
-     * @return obiekt ReportObject jesli dane sa poprawne. W przeciwnym razie null.
+     * @return obiekt ReportObject jesli wprowadzone dane sa poprawne. W przeciwnym razie null.
      */
     private ParseObject createReport() {
         // pobranie danych potrzebnych do stworzenia obiektu Report
@@ -100,7 +103,7 @@ public class ReportActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja wywolywana po udanym wyslaniu danych na serwer. Funkcja wyswietla stosowna informacje oraz zamyka aktywnosc.
+     * Funkcja wywolywana po udanym wyslaniu danych na serwer. Funkcja wyswietla stosowna informacje oraz zamyka aktywnosc powracajac do MainActivity.
      */
     private void afterReport() {
         Toast.makeText(getApplicationContext(), getString(R.string.report_send), Toast.LENGTH_SHORT).show();
@@ -110,24 +113,24 @@ public class ReportActivity extends BaseActivityFunctions {
     /**
      * Funkcja ma za zadanie sprawdzic czy wprowadzone dane sa poprawne.
      *
-     * @param lineId        id linii
-     * @param stopId        id przystanku
-     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia
-     * @return true jesli dane sa poprawne, false w przeciwnym razie
+     * @param lineId        id linii.
+     * @param stopId        id przystanku.
+     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia.
+     * @return true jesli dane sa poprawne, false w przeciwnym razie.
      */
     private boolean isReportDataValid(String lineId, int stopId, int stopPlacement) {
         return db.validate(lineId, stopId, stopPlacement);
     }
 
     /**
-     * Funkcja tworzy obiekt parsa - ReportObject, ktory zawira dane, ktore maja zostac umieszone na serwerze.
+     * Funkcja tworzy obiekt parsa - ReportObject zawirajacy dane, ktore maja zostac umieszone na serwerze.
      *
-     * @param stopId        id przystanku, z ktorego jest wysylany raport
-     * @param lastStopId    id przystanku koncowego dla zglaszanej linii
-     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia
-     * @param lineId        id zglaszanej linii
-     * @param lineNumber    numer linii
-     * @return obiekt parsa zawirajacy informacje o polaczeniu
+     * @param stopId        id przystanku, z ktorego jest wysylany raport.
+     * @param lastStopId    id przystanku koncowego dla zglaszanej linii.
+     * @param stopPlacement umiejscowienie przystanku w kontekscie danego polaczenia.
+     * @param lineId        id zglaszanej linii.
+     * @param lineNumber    numer linii.
+     * @return obiekt parsa zawirajacy informacje o polaczeniu.
      */
     private ParseObject createReportObject(int stopId, int lastStopId, int stopPlacement, String lineId, String lineNumber) {
         // umieszczenie danych w obiekcje Report

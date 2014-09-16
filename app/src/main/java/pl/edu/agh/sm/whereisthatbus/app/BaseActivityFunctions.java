@@ -25,7 +25,8 @@ import java.util.List;
 
 
 /**
- * Funkcja zawiera wspolna funkcjonalnosc dla aktywnosci SearchActivity oraz ReportActivity
+ * Klasa zawiera wspolna funkcjonalnosc dla aktywnosci SearchActivity oraz ReportActivity
+ * tj. zachowanie przy wznowieniu, obsluge menu, ustawienie zachowania adapterow, listenerow.
  */
 public abstract class BaseActivityFunctions extends Activity {
 
@@ -46,6 +47,12 @@ public abstract class BaseActivityFunctions extends Activity {
 
     protected abstract void setActionButtonListeners();
 
+    /**
+     * Funkcja wywolywana przy tworzeniu aktywnosci inicjalizuje obiekty bazy danych,
+     * parsa, sharedpreferences oraz pobiera koordynaty dla przystankow.
+     *
+     * @param savedInstanceState stan instancji.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +63,10 @@ public abstract class BaseActivityFunctions extends Activity {
         Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key)); // inicjalizacja parsa do przesylania odbierania danych z serwera
     }
 
+    /**
+     * Funkcja wywolywana przy kazdym wznowieniu aktywnosci. Sprawdza czy automatyczna lokalizacja
+     * jest wlaczona i jezeli jest ustawia najblizszy przystanek jako aktualny.
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -70,7 +81,8 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja oblicza i ustawia najblizyszy przystanek jako biezacy przystanek
+     * Funkcja oblicza i ustawia najblizyszy przystanek jako biezacy przystanek. Jezeli nie jest
+     * mozliwe okreslenie lokalizacji lub jest wylaczona wyswietlana jest odpowiednia wiadomosc.
      */
     protected void setNearestBusStopAsCurrentBusStop() {
         GPSTracker gpsTracker = new GPSTracker(this);
@@ -82,7 +94,7 @@ public abstract class BaseActivityFunctions extends Activity {
             busStopsName.setText(nearestBusStop);
             busStopsName.performCompletion();
 
-            // ustawia linie, które kursuja przez podany przystanek
+            // ustawia linie, ktore kursuja przez podany przystanek
             setLineNameSpinnerAdapter(db.getBusStopId(nearestBusStop));
 
             // ustawia kierunek dla biezacej linii
@@ -95,9 +107,9 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja zwracajaca nazwe najblizszego przystanku
+     * Funkcja zwraca nazwe najblizszego przystanku na podstawie koordynatow GPS.
      *
-     * @return Zwraca nazwe najblizszego przystanku. Jezeli nie mozna ustalic polozenia funkcja zwraca pusty string
+     * @return Zwraca nazwe najblizszego przystanku. Jezeli nie mozna ustalic polozenia funkcja zwraca pusty string.
      */
     protected String getNearestBusStopName() {
         GPSTracker gpsTracker = new GPSTracker(this);
@@ -123,9 +135,9 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja ustawia dostepne nazwy linii w zaleznosci od wybranego przystanku
+     * Funkcja ustawia dostepne nazwy linii w zaleznosci od wybranego przystanku.
      *
-     * @param busStopId jeśli -1 wstawione zostana nazwy wszystkich linii. W przeciwnym razie zostana wstawione tylko te linie, ktore kursuja przez podany przystanek
+     * @param busStopId jesli -1 wstawione zostana nazwy wszystkich linii. W przeciwnym razie zostana wstawione tylko te linie, ktore kursuja przez podany przystanek.
      */
     protected void setLineNameSpinnerAdapter(int busStopId) {
         ArrayAdapter<String> adapter;
@@ -139,7 +151,7 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja ustawia nazwy przystankow koncowych dla aktualnej linii
+     * Funkcja ustawia nazwy przystankow koncowych dla aktualnie wybranej linii.
      */
     protected void setDirectionSpinnerAdapter() {
         String line = lineNameSpinner.getSelectedItem().toString();
@@ -149,20 +161,20 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja obliczajaca odleglosc pomiedzy dwoma punktami w 2D (x1, y1) (x2, y2) wedlug wzoru sqrt((x1-x2)^2 + (y1-y2)^2)
+     * Funkcja obliczajaca odleglosc pomiedzy dwoma punktami w 2D (x1, y1) (x2, y2) wedlug wzoru sqrt((x1-x2)^2 + (y1-y2)^2).
      *
-     * @param x1 wspolrzedna x pierwszego punktu
-     * @param y1 wspolrzedna y pierwszego punktu
-     * @param x2 wspolrzedna x drugiego punktu
-     * @param y2 wspolrzedna y drugiego punktu
-     * @return odleglosc pomiedzy punktami
+     * @param x1 wspolrzedna x pierwszego punktu.
+     * @param y1 wspolrzedna y pierwszego punktu.
+     * @param x2 wspolrzedna x drugiego punktu.
+     * @param y2 wspolrzedna y drugiego punktu.
+     * @return odleglosc pomiedzy punktami.
      */
     protected double distanceBetweenPoints(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
     }
 
     /**
-     * Funkcja ma za zadanie pobrać nazwy przystanków z bazy danych i dodać je jako podpowiedzi do obiektu AutoCompleteTextView busStopsName
+     * Funkcja ma za zadanie pobrac nazwy przystankow z bazy danych i dodac je jako podpowiedzi do obiektu AutoCompleteTextView busStopsName.
      */
     protected void setBusStopsNameAdapter() {
         ArrayAdapter<String> adapter;
@@ -179,7 +191,8 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja ustawia akcje, ktora ma zostac wykonana po zmianie nazwy przystanku
+     * Funkcja ustawia akcje, ktora ma zostac wykonana po zmianie nazwy przystanku.
+     * Po zmianie nazwy przystanku zmienia sie lista linii oraz ustawione zostaja przystanki koncowe.
      */
     protected void setBusStopsNameListeners() {
         busStopsName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -194,7 +207,8 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja ustawia akcje, ktora ma zostac wykonana po zmianie nazwy linii
+     * Funkcja ustawia akcje, ktora ma zostac wykonana po zmianie nazwy linii.
+     * Po zmianie nazwy linii zmieniane sa dostepne przystanki koncowe.
      */
     protected void setLineNameSpinnerListeners() {
         lineNameSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -211,7 +225,8 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja ustawia akcje, ktora jest wykonywana po nacisnieciu przycisku refresh
+     * Funkcja ustawia akcje, ktora jest wykonywana po nacisnieciu przycisku refresh.
+     * Ustawiany jest najblizszy przystanek jako aktualny przystanek.
      */
     protected void setRefreshButtonListeners() {
         refreshButton.setOnClickListener(new View.OnClickListener() {
@@ -223,10 +238,10 @@ public abstract class BaseActivityFunctions extends Activity {
     }
 
     /**
-     * Funkcja sprawdza polaczenie z internetem
+     * Funkcja sprawdza czy jest mozliwosc dostepu do internetu.
      *
-     * @param context Kontekst aplikacji
-     * @return true jesli jest polaczenie z internetem. W przeciwnym razie false
+     * @param context kontekst aplikacji.
+     * @return true jesli jest polaczenie z internetem. W przeciwnym razie false.
      */
     protected boolean isInternetConnection(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

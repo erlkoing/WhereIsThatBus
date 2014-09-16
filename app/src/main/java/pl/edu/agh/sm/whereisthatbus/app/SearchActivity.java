@@ -36,7 +36,7 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja mapuje odpwoeidnie elementu interfejsu na obiekty + ustawia ich zachowanie
+     * Funkcja przypisuje do obiektow odpowiednie elementy interfejsu oraz ustawia dla nich adaptery, litenery.
      */
     @Override
     protected void setUIActivityElements() {
@@ -57,7 +57,7 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Ustawia zachowanie przycisku send
+     * Ustawia zachowanie dla przycisku send.
      */
     protected void setActionButtonListeners() {
         actionButton.setOnClickListener(new View.OnClickListener() {
@@ -69,7 +69,7 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja pobiera dane z serwera, przetwarza je i wyswietla
+     * Funkcja pobiera dane z serwera, przetwarza i wyswietla.
      */
     private void getInformation() {
         if (isInternetConnection(getApplicationContext())) {
@@ -88,9 +88,9 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funckja tworzy obiekt zawirajacy wszystkie dane potrzebne przy przetwarzaniu zaytania. Stworzona glownie po to by nie przesylac wielu argumentow
+     * Funckja tworzy obiekt zawierajace wszystkie dane potrzebne przy przetwarzaniu zaytania. Stworzona glownie po to by nie przesylac wielu argumentow.
      *
-     * @return obiekt zawierajacy wszystkie potrzebne informacje
+     * @return obiekt zawierajacy wszystkie potrzebne informacje do przetwarzania zapytania.
      */
     private QueryRawData createQueryRawData() {
         // pobranie danych z interfejsu i bazy danych
@@ -130,10 +130,10 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Jezeli wprowadzone dane sa prawidlowe funkcja tworzy odpowiedni obiekt zapytania
+     * Funkcja tworzy obiekt zapytania do serwera.
      *
-     * @param queryRawData obiekt z danymi potrzebnymi do wyslania zapytania
-     * @return obiekt zaytania jesli dane sa prawidlowie w przeciwnym razie null
+     * @param queryRawData obiekt z danymi potrzebnymi do wyslania zapytania.
+     * @return obiekt zaytania jesli dane sa prawidlowie, w przeciwnym razie null.
      */
     private ParseQuery<ParseObject> createQuery(QueryRawData queryRawData) {
         if (isQueryDataValid(queryRawData.getLineId(), queryRawData.getBusStopId(), queryRawData.getStopPlacement())) {
@@ -145,10 +145,10 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja za zadanie wyslanie zapytania do serwera
+     * Funkcja ma za zadanie wyslanie zapytania do serwera i przetworzenie uzyskanej odpowiedzi.
      *
-     * @param query        zapyttanie
-     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do obliczen
+     * @param query        obiekt zapytania do serwera.
+     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do dalszego przetwarzania.
      */
     private void sendQuery(ParseQuery<ParseObject> query, final QueryRawData queryRawData) {
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -165,26 +165,26 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funckja sprawdza czy wprowadzony zewstaw danych jest prawidlowy
+     * Funckja sprawdza czy wprowadzony zewstaw danych jest prawidlowy.
      *
-     * @param lineId        id linii
-     * @param stopId        id przystanku
-     * @param stopPlacement umiejscowienie przystanku w polaczeniu
-     * @return true jesli dane sa poprawne, false w przeciwnym razie
+     * @param lineId        id linii.
+     * @param stopId        id przystanku.
+     * @param stopPlacement umiejscowienie przystanku w polaczeniu.
+     * @return true jesli dane sa poprawne, false w przeciwnym razie.
      */
     private boolean isQueryDataValid(String lineId, int stopId, int stopPlacement) {
         return db.validate(lineId, stopId, stopPlacement);
     }
 
     /**
-     * funkcja tworzy odpwoiedni obiekt zapytania, ktory ma zostac wyslany do serwera
+     * Funkcja tworzy odpowiedni obiekt zapytania, ktory ma zostac wyslany do serwera.
      *
-     * @param lineName                                    nazwa linii
-     * @param lineId                                      id linii
-     * @param lineDirectionId                             id ostatniego przystanku
-     * @param stopPlacement                               umiejscowienie przystanku w polaczeniu
-     * @param timeDifferenceBetweenFirstAndCurrentBusStop czas pomiedzy pierwszym i aktualnym przystankiem
-     * @return obiekt zapytania do serwera
+     * @param lineName                                    nazwa linii.
+     * @param lineId                                      id linii.
+     * @param lineDirectionId                             id ostatniego przystanku.
+     * @param stopPlacement                               umiejscowienie przystanku w polaczeniu.
+     * @param timeDifferenceBetweenFirstAndCurrentBusStop czas pomiedzy pierwszym i aktualnym przystankiem.
+     * @return obiekt zapytania do serwera.
      */
     private ParseQuery<ParseObject> createParseQuery(String lineName, String lineId, int lineDirectionId, int stopPlacement, int timeDifferenceBetweenFirstAndCurrentBusStop) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery(getString(R.string.parse_object_name));
@@ -198,11 +198,11 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja przetwarza odpowiedz z serwera i zwraca liste minut
+     * Funkcja przetwarza odpowiedz z serwera i zwraca liste minut do najblizszych polaczen.
      *
-     * @param parseObjects odpowiedz z serwera
-     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do obliczen
-     * @return lista minut najblizszych polaczen
+     * @param parseObjects odpowiedz z serwera.
+     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do obliczen.
+     * @return lista minut najblizszych polaczen.
      */
     private List<Integer> processParseResponse(List<ParseObject> parseObjects, final QueryRawData queryRawData) {
         List<ReportData> reportDataList = createReportDataList(parseObjects, queryRawData);
@@ -213,11 +213,11 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja odpwiedzialna za stworzenie wiadomosci z infomacja o najblizszych polaczeniach, ktora ma zostac wyswietlona uzytkownikowi
+     * Funkcja odpwiedzialna za stworzenie wiadomosci z infomacja o najblizszych polaczeniach, ktora ma zostac wyswietlona uzytkownikowi.
      *
-     * @param minutesToArrive lista z minutami do przyjazdu autobusu
-     * @param queryRawData    obiekt zawierajacy dane z zapytania potrzebny do obliczen
-     * @return wiadomosc dla uzytkownika
+     * @param minutesToArrive lista z minutami do przyjazdu autobusu.
+     * @param queryRawData    obiekt zawierajacy dane z zapytania potrzebny do obliczen.
+     * @return wiadomosc dla uzytkownika.
      */
     private String createMessage(List<Integer> minutesToArrive, QueryRawData queryRawData) {
         StringBuilder sb = new StringBuilder();
@@ -257,9 +257,9 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja wyswietlajaza alert uzytkownikowi o najblizszych polaczeniach
+     * Funkcja wyswietlajaca alert uzytkownikowi o najblizszych polaczeniach.
      *
-     * @param message wiadomosc ktora ma zostac wyswietlona
+     * @param message wiadomosc, ktora ma zostac wyswietlona uzytkownikowi.
      */
     private void showMessage(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(SearchActivity.this);
@@ -277,10 +277,10 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja analizuje wynik zapytania zwrocony przez parsa i odsiewa niektore wyniki
+     * Funkcja analizuje wynik zapytania zwrocony przez  serwer i odsiewa czesc wynikow.
      *
-     * @param parseObjects obiekt zwrocony przez parsa
-     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do obliczen
+     * @param parseObjects obiekt zwrocony przez parsa.
+     * @param queryRawData obiekt zawierajacy dane z zapytania potrzebny do obliczen.
      * @return lista raportow, ktore mozna dalej przetworzyc. Pusta lista jesli zapytanie nic nie zwrocilo lub zostalo odrzucone.
      */
     private List<ReportData> createReportDataList(List<ParseObject> parseObjects, QueryRawData queryRawData) {
@@ -308,11 +308,11 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funkcja przetwarza wynik zapytania z serwera i zwraca liste minut z najblizszymi polaczeniami
+     * Funkcja przetwarza wynik zapytania z serwera i zwraca liste minut z najblizszymi polaczeniami.
      *
-     * @param reportDataList wstepnie przetworzone dane z serwera
-     * @param queryRawData   obiekt zawierajacy dane z zapytania potrzebny do obliczen
-     * @return lista minut z najblizszymi polaczeniami. Jezeli nie ma informacji o polaczeniu zwracana jest puta lista
+     * @param reportDataList wstepnie przetworzone dane z serwera.
+     * @param queryRawData   obiekt zawierajacy dane z zapytania potrzebny do obliczen.
+     * @return lista minut z najblizszymi polaczeniami. Jezeli nie ma informacji o polaczeniu zwracana jest puta lista.
      */
     private List<Integer> getMinutesToArrive(List<ReportData> reportDataList, QueryRawData queryRawData) {
         List<Integer> minutesToArrive = new ArrayList<Integer>();
@@ -327,11 +327,11 @@ public class SearchActivity extends BaseActivityFunctions {
     }
 
     /**
-     * Funckja majaca za zadanie przetworzyc wstepnie przetworzone dane z serwera w przypadku gdy zgloszen jest wiecej niz 1
+     * Funckja majaca za zadanie przetworzyc wstepnie przetworzone dane z serwera w przypadku gdy zgloszen jest wiecej niz jedno.
      *
-     * @param reportDataList wstepnie przetworzone dane z serwera
-     * @param queryRawData   obiekt zawierajacy dane z zapytania potrzebny do obliczen
-     * @return lista minut do przyjazdu autobusu
+     * @param reportDataList wstepnie przetworzone dane z serwera.
+     * @param queryRawData   obiekt zawierajacy dane z zapytania potrzebny do obliczen.
+     * @return lista minut do przyjazdu autobusu.
      */
     private List<Integer> manyReports(List<ReportData> reportDataList, QueryRawData queryRawData) {
         // sortujemy raporty po czasie ich zgloszenia
@@ -384,7 +384,7 @@ public class SearchActivity extends BaseActivityFunctions {
 }
 
 /**
- * Klasa pomocnicza uzywana przy wysylaniu i przetwarzaniu zapytania
+ * Klasa pomocnicza uzywana przy wysylaniu i przetwarzaniu zapytania.
  */
 class QueryRawData {
     private String busStopName;
@@ -489,7 +489,7 @@ class QueryRawData {
 }
 
 /**
- * klasa pomocnicza uzwana przy przetwarzaniu odpwiedzi z serwera
+ * Klasa pomocnicza uzwana przy przetwarzaniu odpwiedzi z serwera.
  */
 class ReportData {
     long reportTime;
@@ -502,7 +502,7 @@ class ReportData {
 }
 
 /**
- * klasa pomocnicza uzywana przy sortowaniu wynikow zapytania po daciie ich zgloszenia
+ * Klasa pomocnicza uzywana przy sortowaniu wynikow zapytania po dacie ich zgloszenia.
  */
 class ReportDataComparator implements Comparator<ReportData> {
     @Override
